@@ -5,3 +5,4 @@ export * from "./core/adapters";
 export * from "./core/types";
 export * from "./core/selection";
 
+export * from "./types";

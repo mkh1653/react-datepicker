@@ -1,15 +1,19 @@
 import {
   CalendarDate,
   createCalendar,
-  getDayOfWeek,
+  fromDate,
   getLocalTimeZone,
+  getDayOfWeek,
   getWeeksInMonth,
   isSameDay,
   isSameMonth,
   startOfMonth,
   startOfWeek,
+  toCalendar,
+  toCalendarDate,
   today,
 } from "@internationalized/date";
+
 import type { CalendarAdapter } from "./calendar-adapter";
 import type {
   CalendarIdentifier,
@@ -37,6 +41,18 @@ export class InternationalizedDateAdapter implements CalendarAdapter {
     const julianDay = value.calendar.toJulianDay(value);
 
     return this.calendar.fromJulianDay(julianDay);
+  }
+
+  fromDate(date: Date, timeZone: string): CalendarDate {
+    const zonedDate = fromDate(date, timeZone);
+    const converted = toCalendar(zonedDate, this.calendar);
+
+    return toCalendarDate(converted);
+  }
+
+  toDate(date: CalendarDate, timeZone: string): Date {
+    const calendarDate = this.getCalendarDate(date);
+    return calendarDate.toDate(timeZone);
   }
 
   getMonthName(date: CalendarDate, locale: string): string {

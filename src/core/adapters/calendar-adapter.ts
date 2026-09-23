@@ -7,6 +7,10 @@ export interface CalendarAdapter {
 
   getCalendarDate(value: CalendarDate): CalendarDate;
 
+  fromDate(date: Date, timeZone: string): CalendarDate;
+
+  toDate(date: CalendarDate, timeZone: string): Date;
+
   // Month
   getMonthName(date: CalendarDate, locale: string): string;
 
