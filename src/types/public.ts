@@ -5,13 +5,13 @@ export type DateInput = Date | CalendarDate;
 export type DateOutput = Date;
 
 export interface DateRangeInput {
-  start: DateInput | null;
-  end: DateInput | null;
+  start: DateInput;
+  end: DateInput;
 }
 
 export interface DateRangeOutput {
-  start: Date | null;
-  end: Date | null;
+  start: Date;
+  end: Date;
 }
 
 export type MultipleDateInput = DateInput[];
