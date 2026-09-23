@@ -1,23 +1,25 @@
-import type { CalendarDate } from "@internationalized/date";
+import { getLocalTimeZone, type CalendarDate } from "@internationalized/date";
 
 import type { CalendarAdapter } from "../adapters/calendar-adapter";
 import type { DateInput } from "../../types/public";
 
 export interface DateConversionOptions {
-  timeZone: string;
+  timeZone?: string;
 }
 
 export function normalizeDate(
   value: DateInput,
   adapter: CalendarAdapter,
-  options: DateConversionOptions,
+  options: DateConversionOptions = {},
 ): CalendarDate {
+  const timeZone = options.timeZone ?? getLocalTimeZone();
+
   if (value instanceof Date) {
     if (Number.isNaN(value.getTime())) {
       throw new RangeError("Invalid Date");
     }
 
-    return adapter.fromDate(value, options.timeZone);
+    return adapter.fromDate(value, timeZone);
   }
 
   return adapter.getCalendarDate(value);
@@ -26,7 +28,8 @@ export function normalizeDate(
 export function toDate(
   value: CalendarDate,
   adapter: CalendarAdapter,
-  options: DateConversionOptions,
+  options: DateConversionOptions = {},
 ): Date {
-  return adapter.toDate(value, options.timeZone);
+  const timeZone = options.timeZone ?? getLocalTimeZone();
+  return adapter.toDate(value, timeZone);
 }
