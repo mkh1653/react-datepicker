@@ -1,5 +1,5 @@
 import type { CalendarDate } from "@internationalized/date";
-import type { CalendarType } from "../types/calendar";
+import type { CalendarType, DayOfWeek } from "../types/calendar";
 
 export interface CalendarAdapter {
   readonly type: CalendarType;
@@ -7,21 +7,45 @@ export interface CalendarAdapter {
 
   getCalendarDate(value: CalendarDate): CalendarDate;
 
+  // Month
   getMonthName(date: CalendarDate, locale: string): string;
-
-  getWeekdayName(weekday: number, locale: string): string;
-
-  getDaysInMonth(date: CalendarDate): number;
 
   getStartOfMonth(date: CalendarDate): CalendarDate;
 
   addMonths(date: CalendarDate, amount: number): CalendarDate;
 
-  addYears(date: CalendarDate, amount: number): CalendarDate;
+  isSameMonth(a: CalendarDate, b: CalendarDate): boolean;
+
+  // Week
+  getWeekdayName(weekday: number, locale: string): string;
+
+  getStartOfWeek(
+    date: CalendarDate,
+    locale: string,
+    firstDayOfWeek?: DayOfWeek,
+  ): CalendarDate;
+
+  getWeeksInMonth(
+    date: CalendarDate,
+    locale: string,
+    firstDayOfWeek?: DayOfWeek,
+  ): number;
+
+  // Day
+  getDaysInMonth(date: CalendarDate): number;
+
+  getDayOfWeek(
+    date: CalendarDate,
+    locale: string,
+    firstDayOfWeek?: DayOfWeek,
+  ): number;
+
+  addDays(date: CalendarDate, amount: number): CalendarDate;
 
   isSameDay(a: CalendarDate, b: CalendarDate): boolean;
 
-  isSameMonth(a: CalendarDate, b: CalendarDate): boolean;
+  // Year
+  addYears(date: CalendarDate, amount: number): CalendarDate;
 
   compare(a: CalendarDate, b: CalendarDate): number;
 

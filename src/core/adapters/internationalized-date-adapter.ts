@@ -1,15 +1,21 @@
 import {
+  CalendarDate,
   createCalendar,
+  getDayOfWeek,
   getLocalTimeZone,
+  getWeeksInMonth,
   isSameDay,
   isSameMonth,
   startOfMonth,
+  startOfWeek,
   today,
-  CalendarDate,
 } from "@internationalized/date";
-
 import type { CalendarAdapter } from "./calendar-adapter";
-import type { CalendarIdentifier, CalendarType } from "../types/calendar";
+import type {
+  CalendarIdentifier,
+  CalendarType,
+  DayOfWeek,
+} from "../types/calendar";
 
 export class InternationalizedDateAdapter implements CalendarAdapter {
   readonly type: CalendarType;
@@ -28,7 +34,9 @@ export class InternationalizedDateAdapter implements CalendarAdapter {
       return value;
     }
 
-    return value.calendar.fromJulianDay(this.calendar.toJulianDay(value));
+    const julianDay = value.calendar.toJulianDay(value);
+
+    return this.calendar.fromJulianDay(julianDay);
   }
 
   getMonthName(date: CalendarDate, locale: string): string {
@@ -53,6 +61,34 @@ export class InternationalizedDateAdapter implements CalendarAdapter {
     return formatter.format(referenceDate.toDate("UTC"));
   }
 
+  getDayOfWeek(
+    date: CalendarDate,
+    locale: string,
+    firstDayOfWeek?: DayOfWeek,
+  ): number {
+    return getDayOfWeek(this.getCalendarDate(date), locale, firstDayOfWeek);
+  }
+
+  getStartOfWeek(
+    date: CalendarDate,
+    locale: string,
+    firstDayOfWeek?: DayOfWeek,
+  ): CalendarDate {
+    return startOfWeek(
+      this.getCalendarDate(date),
+      locale,
+      firstDayOfWeek,
+    ) as CalendarDate;
+  }
+
+  getWeeksInMonth(
+    date: CalendarDate,
+    locale: string,
+    firstDayOfWeek?: DayOfWeek,
+  ): number {
+    return getWeeksInMonth(this.getCalendarDate(date), locale, firstDayOfWeek);
+  }
+
   getDaysInMonth(date: CalendarDate): number {
     return this.getCalendarDate(date).calendar.getDaysInMonth(
       this.getCalendarDate(date),
@@ -66,6 +102,12 @@ export class InternationalizedDateAdapter implements CalendarAdapter {
   addMonths(date: CalendarDate, amount: number): CalendarDate {
     return this.getCalendarDate(date).add({
       months: amount,
+    });
+  }
+
+  addDays(date: CalendarDate, amount: number): CalendarDate {
+    return this.getCalendarDate(date).add({
+      days: amount,
     });
   }
 
@@ -88,11 +130,14 @@ export class InternationalizedDateAdapter implements CalendarAdapter {
   }
 
   today(timeZone = getLocalTimeZone()): CalendarDate {
-    return today(timeZone).calendar.identifier === this.identifier
-      ? today(timeZone)
-      : this.calendar.fromJulianDay(
-          today(timeZone).calendar.toJulianDay(today(timeZone)),
-        );
+    const currentDate = today(timeZone);
+
+    if (currentDate.calendar.identifier === this.identifier) {
+      return currentDate;
+    }
+
+    const julianDay = currentDate.calendar.toJulianDay(currentDate);
+    return this.calendar.fromJulianDay(julianDay);
   }
 
   format(
