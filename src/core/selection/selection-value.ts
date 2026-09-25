@@ -11,18 +11,14 @@ import type {
   MultipleRangeInput,
   MultipleRangeOutput,
 } from "../../types/public";
-import type {
-  DateRange,
-  MultipleRangeValue,
-  PartialDateRange,
-} from "../types/selection";
+import type { MultipleRangeValue, PartialDateRange } from "../types/selection";
 
 export function normalizeSingleValue(
   value: DateInput | null,
   adapter: CalendarAdapter,
   timeZone?: string,
 ): CalendarDate | null {
-  if (!value) {
+  if (value === null) {
     return null;
   }
 
@@ -43,11 +39,15 @@ export function normalizeRangeValue(
   timeZone?: string,
 ): PartialDateRange {
   return {
-    start: value.start
-      ? normalizeDate(value.start, adapter, { timeZone })
-      : null,
+    start:
+      value.start === null
+        ? null
+        : normalizeDate(value.start, adapter, { timeZone }),
 
-    end: value.end ? normalizeDate(value.end, adapter, { timeZone }) : null,
+    end:
+      value.end === null
+        ? null
+        : normalizeDate(value.end, adapter, { timeZone }),
   };
 }
 
@@ -67,7 +67,7 @@ export function toSingleValue(
   adapter: CalendarAdapter,
   timeZone?: string,
 ): Date | null {
-  if (!value) {
+  if (value === null) {
     return null;
   }
 
@@ -88,9 +88,10 @@ export function toRangeValue(
   timeZone?: string,
 ): DateRangeOutput {
   return {
-    start: value.start ? toDate(value.start, adapter, { timeZone }) : null,
+    start:
+      value.start === null ? null : toDate(value.start, adapter, { timeZone }),
 
-    end: value.end ? toDate(value.end, adapter, { timeZone }) : null,
+    end: value.end === null ? null : toDate(value.end, adapter, { timeZone }),
   };
 }
 

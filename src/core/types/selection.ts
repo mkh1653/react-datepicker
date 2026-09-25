@@ -1,11 +1,11 @@
 import type { DateValue } from "./calendar";
-
-export type SelectionMode = "single" | "multiple" | "range" | "multiple-range";
+import type { SelectionMode } from "../../types";
 
 export interface DateRange {
   start: DateValue;
   end: DateValue;
 }
+export type { SelectionMode };
 
 export interface PartialDateRange {
   start: DateValue | null;

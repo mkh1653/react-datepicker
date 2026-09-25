@@ -1,6 +1,6 @@
 import type { CalendarDate } from "@internationalized/date";
+import type { CalendarType } from "../../types";
 
-export type CalendarType = "gregorian" | "persian" | "islamic";
 export type CalendarIdentifier = "gregory" | "persian" | "islamic-civil";
 export type DateValue = CalendarDate;
 
