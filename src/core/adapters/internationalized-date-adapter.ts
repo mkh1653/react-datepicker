@@ -15,11 +15,8 @@ import {
 } from "@internationalized/date";
 
 import type { CalendarAdapter } from "./calendar-adapter";
-import type {
-  CalendarIdentifier,
-  CalendarType,
-  DayOfWeek,
-} from "../types/calendar";
+import type { CalendarIdentifier, DayOfWeek } from "../types/calendar";
+import type { CalendarType } from "../../types";
 
 export class InternationalizedDateAdapter implements CalendarAdapter {
   readonly type: CalendarType;
@@ -59,22 +56,35 @@ export class InternationalizedDateAdapter implements CalendarAdapter {
     const formatter = new Intl.DateTimeFormat(locale, {
       calendar: this.identifier,
       month: "long",
+      timeZone: "UTC",
     });
 
     return formatter.format(date.toDate("UTC"));
   }
 
-  getWeekdayName(weekday: number, locale: string): string {
-    const referenceDate = new CalendarDate(this.calendar, 2024, 1, 1).add({
+  getWeekdayName(
+    weekday: number,
+    locale: string,
+    firstDayOfWeek?: DayOfWeek,
+  ): string {
+    const referenceDate = this.today("UTC");
+    const weekStart = startOfWeek(
+      referenceDate,
+      locale,
+      firstDayOfWeek,
+    ) as CalendarDate;
+
+    const date = weekStart.add({
       days: weekday,
     });
 
     const formatter = new Intl.DateTimeFormat(locale, {
       calendar: this.identifier,
       weekday: "long",
+      timeZone: "UTC",
     });
 
-    return formatter.format(referenceDate.toDate("UTC"));
+    return formatter.format(date.toDate("UTC"));
   }
 
   getDayOfWeek(
@@ -106,9 +116,9 @@ export class InternationalizedDateAdapter implements CalendarAdapter {
   }
 
   getDaysInMonth(date: CalendarDate): number {
-    return this.getCalendarDate(date).calendar.getDaysInMonth(
-      this.getCalendarDate(date),
-    );
+    const calendarDate = this.getCalendarDate(date);
+
+    return calendarDate.calendar.getDaysInMonth(calendarDate);
   }
 
   getStartOfMonth(date: CalendarDate): CalendarDate {
@@ -162,8 +172,9 @@ export class InternationalizedDateAdapter implements CalendarAdapter {
     options: Intl.DateTimeFormatOptions = {},
   ): string {
     const formatter = new Intl.DateTimeFormat(locale, {
-      calendar: this.identifier,
       ...options,
+      calendar: this.identifier,
+      timeZone: "UTC",
     });
 
     return formatter.format(this.getCalendarDate(date).toDate("UTC"));

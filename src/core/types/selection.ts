@@ -1,14 +1,12 @@
 import type { DateValue } from "./calendar";
+import type {
+  DateRange as GenericDateRange,
+  PartialDateRange as GenericPartialDateRange,
+} from "../../types/range";
 
-export interface DateRange {
-  start: DateValue;
-  end: DateValue;
-}
+export type DateRange = GenericDateRange<DateValue>;
 
-export interface PartialDateRange {
-  start: DateValue | null;
-  end: DateValue | null;
-}
+export type PartialDateRange = GenericPartialDateRange<DateValue>;
 
 export type SingleValue = DateValue | null;
 

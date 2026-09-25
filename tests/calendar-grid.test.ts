@@ -1,6 +1,6 @@
-import { CalendarDate, createCalendar } from "@internationalized/date";
+import { describe, expect, it, vi } from "vitest";
 
-import { describe, expect, it } from "vitest";
+import { CalendarDate, createCalendar } from "@internationalized/date";
 
 import { getCalendarAdapter } from "../src/core/adapters";
 import { createCalendarGrid } from "../src/core/calendar";
@@ -15,6 +15,7 @@ describe("createCalendarGrid", () => {
       date,
       locale: "en-US",
       firstDayOfWeek: "sun",
+      today: new CalendarDate(2026, 9, 23),
     });
 
     expect(grid.weeks.length).toBe(5);
@@ -35,6 +36,7 @@ describe("createCalendarGrid", () => {
       date,
       locale: "en-US",
       firstDayOfWeek: "sun",
+      today: new CalendarDate(2026, 9, 23),
     });
 
     const allDays = grid.weeks.flatMap((week) => week.days);
@@ -60,6 +62,7 @@ describe("createCalendarGrid", () => {
       date,
       locale: "fa-IR",
       firstDayOfWeek: "sat",
+      today: new CalendarDate(2026, 9, 23),
     });
 
     expect(grid.weeks.length).toBeGreaterThanOrEqual(4);
@@ -82,6 +85,7 @@ describe("createCalendarGrid", () => {
       date,
       locale: "en",
       firstDayOfWeek: "sun",
+      today: new CalendarDate(2026, 9, 23),
     });
 
     expect(grid.weeks.length).toBeGreaterThanOrEqual(4);
@@ -89,19 +93,23 @@ describe("createCalendarGrid", () => {
     expect(grid.weeks.every((week) => week.days.length === 7)).toBe(true);
   });
 
-  it("marks today correctly", () => {
+  it("marks the provided date as today", () => {
     const adapter = getCalendarAdapter("gregorian");
 
-    const today = adapter.today();
+    const today = new CalendarDate(2026, 9, 23);
 
     const grid = createCalendarGrid(adapter, {
-      date: today,
+      date: new CalendarDate(2026, 9, 1),
       locale: "en-US",
       firstDayOfWeek: "sun",
+      today,
     });
 
     const allDays = grid.weeks.flatMap((week) => week.days);
 
-    expect(allDays.filter((day) => day.isToday).length).toBe(1);
+    const todayDays = allDays.filter((day) => day.isToday);
+
+    expect(todayDays).toHaveLength(1);
+    expect(todayDays[0].date).toEqual(today);
   });
 });

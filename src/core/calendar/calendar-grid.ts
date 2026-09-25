@@ -21,6 +21,7 @@ export interface CalendarGrid {
 export interface CreateCalendarGridOptions {
   date: CalendarDate;
   locale: string;
+  today: CalendarDate;
   firstDayOfWeek?: DayOfWeek;
 }
 
@@ -28,7 +29,7 @@ export function createCalendarGrid(
   adapter: CalendarAdapter,
   options: CreateCalendarGridOptions,
 ): CalendarGrid {
-  const { date, locale, firstDayOfWeek } = options;
+  const { date, locale, firstDayOfWeek, today } = options;
 
   const monthStart = adapter.getStartOfMonth(date);
 
@@ -39,8 +40,6 @@ export function createCalendarGrid(
     locale,
     firstDayOfWeek,
   );
-
-  const today = adapter.today();
 
   const totalDays = weeksInMonth * 7;
 

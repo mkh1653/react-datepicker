@@ -286,4 +286,22 @@ describe("selection engine", () => {
       ),
     ).toBe(false);
   });
+
+  it("does not consider a partial range selected", () => {
+    const start = new CalendarDate(2026, 9, 10);
+
+    const result = isDateSelected(
+      start,
+      {
+        mode: "range",
+        value: {
+          start,
+          end: null,
+        },
+      },
+      adapter,
+    );
+
+    expect(result).toBe(false);
+  });
 });

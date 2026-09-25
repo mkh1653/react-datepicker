@@ -58,7 +58,7 @@ export function normalizeMultipleRangeValue(
 ): MultipleRangeValue {
   return value.map((range) => ({
     start: normalizeDate(range.start, adapter, { timeZone }),
-    end: normalizeDate(range.end!, adapter, { timeZone }),
+    end: normalizeDate(range.end, adapter, { timeZone }),
   }));
 }
 

@@ -28,19 +28,7 @@ export interface DatePickerCommonProps {
 
   isDateDisabled?: (date: Date) => boolean;
 
-  open?: boolean;
-
-  defaultOpen?: boolean;
-
-  onOpenChange?: (open: boolean) => void;
-
   closeOnSelect?: boolean;
-
-  visibleDate?: DateInput;
-
-  defaultVisibleDate?: DateInput;
-
-  onVisibleDateChange?: (date: Date) => void;
 
   disabled?: boolean;
 
@@ -48,6 +36,36 @@ export interface DatePickerCommonProps {
 
   children?: ReactNode;
 }
+
+interface ControlledOpenProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  defaultOpen?: never;
+}
+
+interface UncontrolledOpenProps {
+  open?: never;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+type OpenProps = ControlledOpenProps | UncontrolledOpenProps;
+
+interface ControlledVisibleDateProps {
+  visibleDate: DateInput;
+  onVisibleDateChange: (date: Date) => void;
+  defaultVisibleDate?: never;
+}
+
+interface UncontrolledVisibleDateProps {
+  visibleDate?: never;
+  defaultVisibleDate?: DateInput;
+  onVisibleDateChange?: (date: Date) => void;
+}
+
+type VisibleDateProps =
+  | ControlledVisibleDateProps
+  | UncontrolledVisibleDateProps;
 
 interface ControlledValueProps<TInput, TOutput> {
   value: TInput;
@@ -69,21 +87,29 @@ type ValueProps<TInput, TOutput> =
   | ControlledValueProps<TInput, TOutput>
   | UncontrolledValueProps<TInput, TOutput>;
 
-export type SingleDatePickerProps = DatePickerCommonProps & {
-  selectionMode?: "single";
-} & ValueProps<DateInput | null, Date | null>;
+export type SingleDatePickerProps = DatePickerCommonProps &
+  OpenProps &
+  VisibleDateProps & {
+    selectionMode?: "single";
+  } & ValueProps<DateInput | null, Date | null>;
 
-export type MultipleDatePickerProps = DatePickerCommonProps & {
-  selectionMode: "multiple";
-} & ValueProps<MultipleDateInput, MultipleDateOutput>;
+export type MultipleDatePickerProps = DatePickerCommonProps &
+  OpenProps &
+  VisibleDateProps & {
+    selectionMode: "multiple";
+  } & ValueProps<MultipleDateInput, MultipleDateOutput>;
 
-export type RangeDatePickerProps = DatePickerCommonProps & {
-  selectionMode: "range";
-} & ValueProps<DateRangeInput, DateRangeOutput>;
+export type RangeDatePickerProps = DatePickerCommonProps &
+  OpenProps &
+  VisibleDateProps & {
+    selectionMode: "range";
+  } & ValueProps<DateRangeInput, DateRangeOutput>;
 
-export type MultipleRangeDatePickerProps = DatePickerCommonProps & {
-  selectionMode: "multiple-range";
-} & ValueProps<MultipleRangeInput, MultipleRangeOutput>;
+export type MultipleRangeDatePickerProps = DatePickerCommonProps &
+  OpenProps &
+  VisibleDateProps & {
+    selectionMode: "multiple-range";
+  } & ValueProps<MultipleRangeInput, MultipleRangeOutput>;
 
 export type DatePickerProps =
   | SingleDatePickerProps

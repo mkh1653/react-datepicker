@@ -1,5 +1,6 @@
 import type { CalendarDate } from "@internationalized/date";
-import type { CalendarType, DayOfWeek } from "../types/calendar";
+import type { DayOfWeek } from "../types/calendar";
+import type { CalendarType } from "../../types/public";
 
 export interface CalendarAdapter {
   readonly type: CalendarType;
@@ -21,7 +22,11 @@ export interface CalendarAdapter {
   isSameMonth(a: CalendarDate, b: CalendarDate): boolean;
 
   // Week
-  getWeekdayName(weekday: number, locale: string): string;
+  getWeekdayName(
+    weekday: number,
+    locale: string,
+    firstDayOfWeek?: DayOfWeek,
+  ): string;
 
   getStartOfWeek(
     date: CalendarDate,
