@@ -136,6 +136,10 @@ describe("createInitialDatePickerState", () => {
           end: secondEnd,
         },
       ],
+      pendingRange: {
+        start: null,
+        end: null,
+      },
     });
   });
 

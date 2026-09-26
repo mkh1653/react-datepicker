@@ -66,6 +66,10 @@ function getInitialSelection(
     return {
       mode: "multiple-range",
       value: normalizeMultipleRangeValue(value, adapter, timeZone),
+      pendingRange: {
+        start: null,
+        end: null,
+      },
     };
   }
 

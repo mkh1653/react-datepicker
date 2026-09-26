@@ -16,6 +16,12 @@ export type RangeValue = DateRange | null;
 
 export type MultipleRangeValue = DateRange[];
 
+export type MultipleRangeSelection = {
+  mode: "multiple-range";
+  value: MultipleRangeValue;
+  pendingRange: PartialDateRange;
+};
+
 export type SelectionValue =
   | SingleValue
   | MultipleValue
@@ -35,7 +41,4 @@ export type SelectionInput =
       mode: "range";
       value: PartialDateRange;
     }
-  | {
-      mode: "multiple-range";
-      value: MultipleRangeValue;
-    };
+  | MultipleRangeSelection;

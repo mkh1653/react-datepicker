@@ -1,5 +1,8 @@
 import type { CalendarDate } from "@internationalized/date";
-import type { PartialDateRange } from "../src/core/types/selection";
+import type {
+  PartialDateRange,
+  MultipleRangeSelection,
+} from "../src/core/types/selection";
 
 const date = {} as CalendarDate;
 
@@ -28,3 +31,30 @@ void emptyRange;
 void partialRange;
 void completedRange;
 void invalidRange;
+
+const multipleRangeSelection: MultipleRangeSelection = {
+  mode: "multiple-range",
+  value: [
+    {
+      start: date,
+      end: date,
+    },
+  ],
+  pendingRange: {
+    start: null,
+    end: null,
+  },
+};
+
+void multipleRangeSelection;
+
+const pendingMultipleRangeSelection: MultipleRangeSelection = {
+  mode: "multiple-range",
+  value: [],
+  pendingRange: {
+    start: date,
+    end: null,
+  },
+};
+
+void pendingMultipleRangeSelection;
