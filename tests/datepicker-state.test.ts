@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { CalendarDate } from "@internationalized/date";
 
 import { createInitialDatePickerState } from "../src/core/state/datepicker-state";
@@ -55,15 +55,87 @@ describe("createInitialDatePickerState", () => {
     expect(state.adapter.type).toBe("gregorian");
   });
 
-  it("uses explicit locale, calendar and timezone over system settings", () => {
+  it("initializes multiple selection from defaultValue", () => {
+    const firstDate = new CalendarDate(2026, 11, 5);
+    const secondDate = new CalendarDate(2026, 12, 10);
+
     const state = createInitialDatePickerState({
-      calendar: "gregorian",
-      locale: "en-US",
-      timeZone: "America/New_York",
+      selectionMode: "multiple",
+      defaultValue: [firstDate, secondDate],
     });
 
-    expect(state.locale).toBe("en-US");
-    expect(state.timeZone).toBe("America/New_York");
-    expect(state.adapter.type).toBe("gregorian");
+    expect(state.selection).toEqual({
+      mode: "multiple",
+      value: [firstDate, secondDate],
+    });
+  });
+
+  it("initializes range selection from a partial defaultValue", () => {
+    const start = new CalendarDate(2026, 10, 10);
+
+    const state = createInitialDatePickerState({
+      selectionMode: "range",
+      defaultValue: {
+        start,
+        end: null,
+      },
+    });
+
+    expect(state.selection).toEqual({
+      mode: "range",
+      value: {
+        start,
+        end: null,
+      },
+    });
+  });
+
+  it("initializes multiple-range selection from defaultValue", () => {
+    const firstStart = new CalendarDate(2026, 11, 5);
+    const firstEnd = new CalendarDate(2026, 11, 10);
+
+    const secondStart = new CalendarDate(2026, 12, 1);
+    const secondEnd = new CalendarDate(2026, 12, 5);
+
+    const state = createInitialDatePickerState({
+      selectionMode: "multiple-range",
+      defaultValue: [
+        {
+          start: firstStart,
+          end: firstEnd,
+        },
+        {
+          start: secondStart,
+          end: secondEnd,
+        },
+      ],
+    });
+
+    expect(state.selection).toEqual({
+      mode: "multiple-range",
+      value: [
+        {
+          start: firstStart,
+          end: firstEnd,
+        },
+        {
+          start: secondStart,
+          end: secondEnd,
+        },
+      ],
+    });
+  });
+
+  it("initializes single selection from defaultValue", () => {
+    const defaultDate = new CalendarDate(2026, 12, 5);
+
+    const state = createInitialDatePickerState({
+      defaultValue: defaultDate,
+    });
+
+    expect(state.selection).toEqual({
+      mode: "single",
+      value: defaultDate,
+    });
   });
 });

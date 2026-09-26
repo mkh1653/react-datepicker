@@ -16,8 +16,6 @@ import {
   normalizeSingleValue,
 } from "../selection";
 
-const systemLocale = getSystemLocale();
-
 export interface DatePickerState {
   adapter: CalendarAdapter;
   locale: string;
@@ -112,6 +110,7 @@ function getInitialVisibleDate(
 export function createInitialDatePickerState(
   props: DatePickerProps = {},
 ): DatePickerState {
+  const systemLocale = getSystemLocale();
   const calendar = props.calendar ?? systemLocale.calendar;
   const locale = props.locale ?? systemLocale.locale;
   const timeZone = props.timeZone ?? systemLocale.timeZone;
