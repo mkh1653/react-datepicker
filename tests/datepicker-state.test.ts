@@ -43,6 +43,19 @@ describe("createInitialDatePickerState", () => {
     expect(state.visibleDate).toEqual(selectedDate);
   });
 
+  it("prefers defaultVisibleDate over selection", () => {
+    const defaultVisibleDate = new CalendarDate(2027, 2, 15);
+    const selectedDate = new CalendarDate(2026, 12, 5);
+
+    const state = createInitialDatePickerState({
+      defaultVisibleDate,
+      value: selectedDate,
+      onChange: () => {},
+    });
+
+    expect(state.visibleDate).toEqual(defaultVisibleDate);
+  });
+
   it("uses explicit locale, calendar and timezone over system settings", () => {
     const state = createInitialDatePickerState({
       calendar: "gregorian",
@@ -137,5 +150,32 @@ describe("createInitialDatePickerState", () => {
       mode: "single",
       value: defaultDate,
     });
+  });
+
+  it("initializes open state from defaultOpen", () => {
+    const state = createInitialDatePickerState({
+      defaultOpen: true,
+    });
+
+    expect(state.open).toBe(true);
+  });
+
+  it("initializes open state from controlled open", () => {
+    const state = createInitialDatePickerState({
+      open: true,
+      onOpenChange: () => {},
+    });
+
+    expect(state.open).toBe(true);
+  });
+
+  it("uses defaultVisibleDate as initial visible date", () => {
+    const defaultVisibleDate = new CalendarDate(2027, 2, 15);
+
+    const state = createInitialDatePickerState({
+      defaultVisibleDate,
+    });
+
+    expect(state.visibleDate).toEqual(defaultVisibleDate);
   });
 });
