@@ -64,4 +64,28 @@ describe("changeVisibleDate", () => {
 
     expect(result.calendar.identifier).toBe("persian");
   });
+
+  it("clamps the day when moving to a shorter month", () => {
+    const visibleDate = new CalendarDate(2026, 1, 31);
+
+    const result = changeVisibleDate(visibleDate, 1, "month", adapter);
+
+    expect(result).toEqual(new CalendarDate(2026, 2, 28));
+  });
+
+  it("clamps February to 28 when moving from January 31 in a non-leap year", () => {
+    const visibleDate = new CalendarDate(2025, 1, 31);
+
+    const result = changeVisibleDate(visibleDate, 1, "month", adapter);
+
+    expect(result).toEqual(new CalendarDate(2025, 2, 28));
+  });
+
+  it("clamps February to 29 in a leap year", () => {
+    const visibleDate = new CalendarDate(2024, 1, 31);
+
+    const result = changeVisibleDate(visibleDate, 1, "month", adapter);
+
+    expect(result).toEqual(new CalendarDate(2024, 2, 29));
+  });
 });
