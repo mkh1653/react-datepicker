@@ -12,7 +12,7 @@ describe("changeVisibleDate", () => {
 
     const result = changeVisibleDate(visibleDate, 1, "month", adapter);
 
-    expect(result).toEqual(new CalendarDate(2026, 10, 15));
+    expect(result).toEqual(new CalendarDate(2026, 10, 1));
   });
 
   it("moves one month backward", () => {
@@ -20,7 +20,7 @@ describe("changeVisibleDate", () => {
 
     const result = changeVisibleDate(visibleDate, -1, "month", adapter);
 
-    expect(result).toEqual(new CalendarDate(2026, 8, 15));
+    expect(result).toEqual(new CalendarDate(2026, 8, 1));
   });
 
   it("moves one year forward", () => {
@@ -28,7 +28,7 @@ describe("changeVisibleDate", () => {
 
     const result = changeVisibleDate(visibleDate, 1, "year", adapter);
 
-    expect(result).toEqual(new CalendarDate(2027, 9, 15));
+    expect(result).toEqual(new CalendarDate(2027, 9, 1));
   });
 
   it("moves one year backward", () => {
@@ -36,7 +36,7 @@ describe("changeVisibleDate", () => {
 
     const result = changeVisibleDate(visibleDate, -1, "year", adapter);
 
-    expect(result).toEqual(new CalendarDate(2025, 9, 15));
+    expect(result).toEqual(new CalendarDate(2025, 9, 1));
   });
 
   it("supports moving multiple months at once", () => {
@@ -44,7 +44,7 @@ describe("changeVisibleDate", () => {
 
     const result = changeVisibleDate(visibleDate, 3, "month", adapter);
 
-    expect(result).toEqual(new CalendarDate(2026, 12, 15));
+    expect(result).toEqual(new CalendarDate(2026, 12, 1));
   });
 
   it("supports moving multiple years at once", () => {
@@ -52,7 +52,7 @@ describe("changeVisibleDate", () => {
 
     const result = changeVisibleDate(visibleDate, 3, "year", adapter);
 
-    expect(result).toEqual(new CalendarDate(2029, 9, 15));
+    expect(result).toEqual(new CalendarDate(2029, 9, 1));
   });
 
   it("works with the active calendar", () => {
@@ -65,27 +65,10 @@ describe("changeVisibleDate", () => {
     expect(result.calendar.identifier).toBe("persian");
   });
 
-  it("clamps the day when moving to a shorter month", () => {
+  it("returns the first day of the target month", () => {
     const visibleDate = new CalendarDate(2026, 1, 31);
-
     const result = changeVisibleDate(visibleDate, 1, "month", adapter);
 
-    expect(result).toEqual(new CalendarDate(2026, 2, 28));
-  });
-
-  it("clamps February to 28 when moving from January 31 in a non-leap year", () => {
-    const visibleDate = new CalendarDate(2025, 1, 31);
-
-    const result = changeVisibleDate(visibleDate, 1, "month", adapter);
-
-    expect(result).toEqual(new CalendarDate(2025, 2, 28));
-  });
-
-  it("clamps February to 29 in a leap year", () => {
-    const visibleDate = new CalendarDate(2024, 1, 31);
-
-    const result = changeVisibleDate(visibleDate, 1, "month", adapter);
-
-    expect(result).toEqual(new CalendarDate(2024, 2, 29));
+    expect(result).toEqual(new CalendarDate(2026, 2, 1));
   });
 });

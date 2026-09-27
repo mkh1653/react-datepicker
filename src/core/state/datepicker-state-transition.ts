@@ -20,6 +20,10 @@ export type DatePickerStateAction =
     }
   | {
       type: "close";
+    }
+  | {
+      type: "select-calendar-date";
+      date: CalendarDate;
     };
 
 export function transitionDatePickerState(
@@ -69,5 +73,34 @@ export function transitionDatePickerState(
         ...state,
         open: false,
       };
+    case "select-calendar-date": {
+      if (isDateDisabled(action.date, state.constraints, state.adapter)) {
+        return state;
+      }
+
+      const visibleDate = state.adapter.isSameMonth(
+        state.visibleDate,
+        action.date,
+      )
+        ? state.visibleDate
+        : state.adapter.getStartOfMonth(action.date);
+
+      const selection = selectDate(
+        state.selection,
+        action.date,
+        state.adapter,
+        state.constraints,
+      );
+
+      return {
+        ...state,
+        visibleDate,
+        selection,
+        open:
+          state.closeOnSelect && isSelectionComplete(selection)
+            ? false
+            : state.open,
+      };
+    }
   }
 }

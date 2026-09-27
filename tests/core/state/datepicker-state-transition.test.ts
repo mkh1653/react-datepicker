@@ -130,7 +130,7 @@ describe("transitionDatePickerState", () => {
 
     const result = transitionDatePickerState(state, action);
 
-    expect(result.visibleDate).toEqual(new CalendarDate(2026, 10, 10));
+    expect(result.visibleDate).toEqual(new CalendarDate(2026, 10, 1));
 
     expect(result.selection).toEqual(state.selection);
     expect(result.open).toBe(state.open);
@@ -403,6 +403,111 @@ describe("transitionDatePickerState", () => {
       date: disabledDate,
     });
 
+    expect(result.selection).toEqual(state.selection);
+    expect(result.open).toBe(true);
+  });
+});
+
+describe("select-calendar-date", () => {
+  it("selects a date from the current visible month without changing visibleDate", () => {
+    const visibleDate = new CalendarDate(2026, 9, 15);
+    const selectedDate = new CalendarDate(2026, 9, 20);
+
+    const state = createInitialDatePickerState({
+      calendar: "gregorian",
+      locale: "en-US",
+      timeZone: "UTC",
+      value: visibleDate,
+      onChange: () => {},
+      defaultVisibleDate: visibleDate,
+    });
+
+    const result = transitionDatePickerState(state, {
+      type: "select-calendar-date",
+      date: selectedDate,
+    });
+
+    expect(result.selection).toEqual({
+      mode: "single",
+      value: selectedDate,
+    });
+
+    expect(result.visibleDate).toEqual(new CalendarDate(2026, 9, 1));
+  });
+
+  it("moves visibleDate to the clicked date's month before selecting it", () => {
+    const visibleDate = new CalendarDate(2026, 9, 15);
+    const selectedDate = new CalendarDate(2026, 10, 1);
+
+    const state = createInitialDatePickerState({
+      calendar: "gregorian",
+      locale: "en-US",
+      timeZone: "UTC",
+      value: visibleDate,
+      onChange: () => {},
+      defaultVisibleDate: visibleDate,
+    });
+
+    const result = transitionDatePickerState(state, {
+      type: "select-calendar-date",
+      date: selectedDate,
+    });
+
+    expect(result.visibleDate).toEqual(selectedDate);
+
+    expect(result.selection).toEqual({
+      mode: "single",
+      value: selectedDate,
+    });
+  });
+
+  it("moves visibleDate to the previous month when an adjacent date is selected", () => {
+    const visibleDate = new CalendarDate(2026, 9, 15);
+    const selectedDate = new CalendarDate(2026, 8, 31);
+
+    const state = createInitialDatePickerState({
+      calendar: "gregorian",
+      locale: "en-US",
+      timeZone: "UTC",
+      value: visibleDate,
+      onChange: () => {},
+      defaultVisibleDate: visibleDate,
+    });
+
+    const result = transitionDatePickerState(state, {
+      type: "select-calendar-date",
+      date: selectedDate,
+    });
+
+    expect(result.visibleDate).toEqual(new CalendarDate(2026, 8, 1));
+
+    expect(result.selection).toEqual({
+      mode: "single",
+      value: selectedDate,
+    });
+  });
+
+  it("does not change visibleDate when the clicked date is disabled", () => {
+    const visibleDate = new CalendarDate(2026, 9, 15);
+    const disabledDate = new CalendarDate(2026, 10, 1);
+
+    const state = createInitialDatePickerState({
+      calendar: "gregorian",
+      locale: "en-US",
+      timeZone: "UTC",
+      value: visibleDate,
+      onChange: () => {},
+      defaultVisibleDate: visibleDate,
+      disabledDates: [disabledDate],
+      defaultOpen: true,
+    });
+
+    const result = transitionDatePickerState(state, {
+      type: "select-calendar-date",
+      date: disabledDate,
+    });
+
+    expect(result.visibleDate).toEqual(new CalendarDate(2026, 9, 1));
     expect(result.selection).toEqual(state.selection);
     expect(result.open).toBe(true);
   });

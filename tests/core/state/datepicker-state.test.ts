@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CalendarDate } from "@internationalized/date";
+import { CalendarDate, today } from "@internationalized/date";
 
 import { createInitialDatePickerState } from "../../../src/core/state/datepicker-state";
 import { getSystemLocale } from "../../../src/core/locale";
@@ -21,7 +21,9 @@ describe("createInitialDatePickerState", () => {
       value: null,
     });
 
-    expect(state.visibleDate).toEqual(state.today);
+    expect(state.visibleDate).toEqual(
+      state.adapter.getStartOfMonth(state.today),
+    );
     expect(state.constraints).toEqual({});
   });
 
@@ -40,7 +42,7 @@ describe("createInitialDatePickerState", () => {
       value: selectedDate,
     });
 
-    expect(state.visibleDate).toEqual(selectedDate);
+    expect(state.visibleDate).toEqual(new CalendarDate(2026, 12, 1));
   });
 
   it("prefers defaultVisibleDate over selection", () => {
@@ -53,7 +55,7 @@ describe("createInitialDatePickerState", () => {
       onChange: () => {},
     });
 
-    expect(state.visibleDate).toEqual(defaultVisibleDate);
+    expect(state.visibleDate).toEqual(new CalendarDate(2027, 2, 1));
   });
 
   it("uses explicit locale, calendar and timezone over system settings", () => {
@@ -180,6 +182,6 @@ describe("createInitialDatePickerState", () => {
       defaultVisibleDate,
     });
 
-    expect(state.visibleDate).toEqual(defaultVisibleDate);
+    expect(state.visibleDate).toEqual(new CalendarDate(2027, 2, 1));
   });
 });

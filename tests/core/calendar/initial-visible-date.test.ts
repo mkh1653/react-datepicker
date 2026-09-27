@@ -25,7 +25,7 @@ describe("resolveInitialVisibleDate", () => {
       adapter,
     });
 
-    expect(result).toEqual(visibleDate);
+    expect(result).toEqual(new CalendarDate(2026, 11, 1));
   });
 
   it("uses defaultVisibleDate when visibleDate is not provided", () => {
@@ -37,7 +37,7 @@ describe("resolveInitialVisibleDate", () => {
       adapter,
     });
 
-    expect(result).toEqual(defaultVisibleDate);
+    expect(result).toEqual(new CalendarDate(2026, 10, 1));
   });
 
   it("uses the single selection when no visible date is provided", () => {
@@ -53,7 +53,7 @@ describe("resolveInitialVisibleDate", () => {
       adapter,
     });
 
-    expect(result).toEqual(selection.value);
+    expect(result).toEqual(new CalendarDate(2026, 12, 1));
   });
 
   it("uses the first date for multiple selection", () => {
@@ -71,7 +71,7 @@ describe("resolveInitialVisibleDate", () => {
       adapter,
     });
 
-    expect(result).toEqual(firstDate);
+    expect(result).toEqual(new CalendarDate(2026, 11, 1));
   });
 
   it("uses the range start for range selection", () => {
@@ -92,7 +92,7 @@ describe("resolveInitialVisibleDate", () => {
       adapter,
     });
 
-    expect(result).toEqual(start);
+    expect(result).toEqual(new CalendarDate(2026, 10, 1));
   });
 
   it("uses the first range start for multiple-range selection", () => {
@@ -110,6 +110,10 @@ describe("resolveInitialVisibleDate", () => {
           end: new CalendarDate(2026, 12, 5),
         },
       ],
+      pendingRange: {
+        start: null,
+        end: null,
+      },
     };
 
     const result = resolveInitialVisibleDate({
@@ -119,7 +123,7 @@ describe("resolveInitialVisibleDate", () => {
       adapter,
     });
 
-    expect(result).toEqual(firstStart);
+    expect(result).toEqual(new CalendarDate(2026, 11, 1));
   });
 
   it("uses today when no visible date or selection exists", () => {
@@ -129,7 +133,7 @@ describe("resolveInitialVisibleDate", () => {
       adapter,
     });
 
-    expect(result).toEqual(today);
+    expect(result).toEqual(new CalendarDate(2026, 9, 1));
   });
 
   it("uses the nearest selectable date when today is disabled", () => {
@@ -147,7 +151,7 @@ describe("resolveInitialVisibleDate", () => {
       adapter,
     });
 
-    expect(result).toEqual(new CalendarDate(2026, 9, 26));
+    expect(result).toEqual(new CalendarDate(2026, 9, 1));
   });
 
   it("prefers the future date when both nearest dates are equally distant", () => {
@@ -163,7 +167,7 @@ describe("resolveInitialVisibleDate", () => {
       adapter,
     });
 
-    expect(result).toEqual(new CalendarDate(2026, 9, 26));
+    expect(result).toEqual(new CalendarDate(2026, 9, 1));
   });
 
   it("uses the selection even when the selected date is disabled", () => {
@@ -185,7 +189,7 @@ describe("resolveInitialVisibleDate", () => {
       adapter,
     });
 
-    expect(result).toEqual(selectedDate);
+    expect(result).toEqual(new CalendarDate(2026, 9, 1));
   });
 
   it("returns today when no selectable date exists within the allowed range", () => {
@@ -201,7 +205,7 @@ describe("resolveInitialVisibleDate", () => {
       adapter,
     });
 
-    expect(result).toEqual(today);
+    expect(result).toEqual(new CalendarDate(2026, 9, 1));
   });
 
   it("uses the nearest selectable date before today when the future boundary is exhausted", () => {
@@ -218,7 +222,7 @@ describe("resolveInitialVisibleDate", () => {
       adapter,
     });
 
-    expect(result).toEqual(new CalendarDate(2026, 9, 24));
+    expect(result).toEqual(new CalendarDate(2026, 9, 1));
   });
 
   it("uses the nearest selectable date after today when the past boundary is exhausted", () => {
@@ -235,7 +239,7 @@ describe("resolveInitialVisibleDate", () => {
       adapter,
     });
 
-    expect(result).toEqual(new CalendarDate(2026, 9, 26));
+    expect(result).toEqual(new CalendarDate(2026, 9, 1));
   });
 
   it("returns today when no selectable date is found", () => {
@@ -249,6 +253,6 @@ describe("resolveInitialVisibleDate", () => {
       adapter,
     });
 
-    expect(result).toEqual(today);
+    expect(result).toEqual(new CalendarDate(2026, 9, 1));
   });
 });

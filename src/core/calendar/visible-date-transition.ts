@@ -10,9 +10,12 @@ export function changeVisibleDate(
   unit: VisibleDateChangeUnit,
   adapter: CalendarAdapter,
 ): CalendarDate {
-  if (unit === "month") {
-    return adapter.addMonths(visibleDate, amount);
-  }
+  const currentMonth = adapter.getStartOfMonth(visibleDate);
 
-  return adapter.addYears(visibleDate, amount);
+  const nextDate =
+    unit === "month"
+      ? adapter.addMonths(currentMonth, amount)
+      : adapter.addYears(currentMonth, amount);
+
+  return adapter.getStartOfMonth(nextDate);
 }

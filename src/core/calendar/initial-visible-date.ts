@@ -93,18 +93,20 @@ export function resolveInitialVisibleDate({
   adapter,
 }: ResolveInitialVisibleDateOptions): CalendarDate {
   if (visibleDate) {
-    return visibleDate;
+    return adapter.getStartOfMonth(visibleDate);
   }
 
   if (defaultVisibleDate) {
-    return defaultVisibleDate;
+    return adapter.getStartOfMonth(defaultVisibleDate);
   }
 
   const selectionDate = getSelectionDate(selection);
 
   if (selectionDate) {
-    return selectionDate;
+    return adapter.getStartOfMonth(selectionDate);
   }
 
-  return findNearestSelectableDate(today, constraints, adapter);
+  const initialDate = findNearestSelectableDate(today, constraints, adapter);
+
+  return adapter.getStartOfMonth(initialDate);
 }
