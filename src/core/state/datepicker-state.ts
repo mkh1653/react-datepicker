@@ -29,6 +29,7 @@ export interface DatePickerState {
   constraints: DateConstraints;
 
   open: boolean;
+  closeOnSelect: boolean;
 }
 
 function getInitialSelection(
@@ -146,6 +147,7 @@ export function createInitialDatePickerState(
   );
 
   const open = "open" in props ? props.open : (props.defaultOpen ?? false);
+  const closeOnSelect = props.closeOnSelect ?? true;
 
   return {
     adapter,
@@ -156,5 +158,6 @@ export function createInitialDatePickerState(
     selection,
     constraints,
     open,
+    closeOnSelect,
   };
 }

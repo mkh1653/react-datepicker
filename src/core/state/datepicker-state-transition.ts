@@ -1,8 +1,9 @@
 import type { CalendarDate } from "@internationalized/date";
 
 import { changeVisibleDate, type VisibleDateChangeUnit } from "../calendar";
-import { selectDate } from "../selection";
+import { selectDate, isSelectionComplete } from "../selection";
 import type { DatePickerState } from "./datepicker-state";
+import { isDateDisabled } from "../constraints";
 
 export type DatePickerStateAction =
   | {
@@ -27,14 +28,23 @@ export function transitionDatePickerState(
 ): DatePickerState {
   switch (action.type) {
     case "select-date":
+      if (isDateDisabled(action.date, state.constraints, state.adapter)) {
+        return state;
+      }
+      const selection = selectDate(
+        state.selection,
+        action.date,
+        state.adapter,
+        state.constraints,
+      );
+
       return {
         ...state,
-        selection: selectDate(
-          state.selection,
-          action.date,
-          state.adapter,
-          state.constraints,
-        ),
+        selection,
+        open:
+          state.closeOnSelect && isSelectionComplete(selection)
+            ? false
+            : state.open,
       };
 
     case "change-visible-date":
