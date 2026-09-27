@@ -2,7 +2,7 @@ import { CalendarDate, createCalendar } from "@internationalized/date";
 
 import { describe, expect, it } from "vitest";
 
-import { getCalendarAdapter } from "../src/core/adapters";
+import { getCalendarAdapter } from "../../../src/core/adapters";
 
 import {
   normalizeMultipleRangeValue,
@@ -13,10 +13,10 @@ import {
   toMultipleValue,
   toRangeValue,
   toSingleValue,
-} from "../src/core/selection";
+} from "../../../src/core/selection";
 
 describe("selection value conversion", () => {
-  const adapter = getCalendarAdapter("persian");
+  const adapter = getCalendarAdapter("jalali");
 
   const firstDate = new Date("2026-09-23T00:00:00.000Z");
 

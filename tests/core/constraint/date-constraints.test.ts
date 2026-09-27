@@ -1,8 +1,8 @@
 import { CalendarDate } from "@internationalized/date";
 import { describe, expect, it, vi } from "vitest";
 
-import { getCalendarAdapter } from "../src/core/adapters";
-import { isDateDisabled } from "../src/core/constraints";
+import { getCalendarAdapter } from "../../../src/core/adapters";
+import { isDateDisabled } from "../../../src/core/constraints";
 
 describe("date constraints", () => {
   const adapter = getCalendarAdapter("gregorian");

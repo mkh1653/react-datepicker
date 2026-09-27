@@ -1,11 +1,12 @@
 import { InternationalizedDateAdapter } from "./internationalized-date-adapter";
 
 import type { CalendarAdapter } from "./calendar-adapter";
-import type { CalendarIdentifier, CalendarType } from "../types/calendar";
+import type { CalendarIdentifier } from "../types/calendar";
+import type { CalendarType } from "../../types/public";
 
 const CALENDAR_IDENTIFIERS: Record<CalendarType, CalendarIdentifier> = {
   gregorian: "gregory",
-  persian: "persian",
+  jalali: "persian",
   islamic: "islamic-civil",
 };
 

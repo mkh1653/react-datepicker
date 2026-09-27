@@ -1,12 +1,12 @@
 import { CalendarDate } from "@internationalized/date";
 import { describe, expect, it, vi } from "vitest";
 
-import { getCalendarAdapter } from "../src/core/adapters";
-import { normalizeDateConstraints } from "../src/core/constraints";
+import { getCalendarAdapter } from "../../../src/core/adapters";
+import { normalizeDateConstraints } from "../../../src/core/constraints";
 
 describe("date constraints normalization", () => {
   it("normalizes min and max dates", () => {
-    const adapter = getCalendarAdapter("persian");
+    const adapter = getCalendarAdapter("jalali");
 
     const result = normalizeDateConstraints(
       {
@@ -27,7 +27,7 @@ describe("date constraints normalization", () => {
   });
 
   it("normalizes disabled dates", () => {
-    const adapter = getCalendarAdapter("persian");
+    const adapter = getCalendarAdapter("jalali");
 
     const result = normalizeDateConstraints(
       {
@@ -50,7 +50,7 @@ describe("date constraints normalization", () => {
   });
 
   it("normalizes CalendarDate inputs using the target calendar", () => {
-    const adapter = getCalendarAdapter("persian");
+    const adapter = getCalendarAdapter("jalali");
 
     const result = normalizeDateConstraints(
       {

@@ -2,8 +2,8 @@ import { describe, expect, it, vi } from "vitest";
 
 import { CalendarDate, createCalendar } from "@internationalized/date";
 
-import { getCalendarAdapter } from "../src/core/adapters";
-import { createCalendarGrid } from "../src/core/calendar";
+import { getCalendarAdapter } from "../../../src/core/adapters";
+import { createCalendarGrid } from "../../../src/core/calendar";
 
 describe("createCalendarGrid", () => {
   it("creates a Gregorian month grid", () => {

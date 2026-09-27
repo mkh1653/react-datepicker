@@ -1,10 +1,10 @@
 import { CalendarDate } from "@internationalized/date";
 import { describe, expect, it } from "vitest";
 
-import { getCalendarAdapter } from "../src/core/adapters";
-import type { DateConstraints } from "../src/core/constraints";
-import type { SelectionInput } from "../src/core/types/selection";
-import { resolveInitialVisibleDate } from "../src/core/calendar/initial-visible-date";
+import { getCalendarAdapter } from "../../../src/core/adapters";
+import type { DateConstraints } from "../../../src/core/constraints";
+import type { SelectionInput } from "../../../src/core/types/selection";
+import { resolveInitialVisibleDate } from "../../../src/core/calendar/initial-visible-date";
 
 describe("resolveInitialVisibleDate", () => {
   const adapter = getCalendarAdapter("gregorian");

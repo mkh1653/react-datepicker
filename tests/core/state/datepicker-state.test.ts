@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { CalendarDate } from "@internationalized/date";
 
-import { createInitialDatePickerState } from "../src/core/state/datepicker-state";
-import { getSystemLocale } from "../src/core/locale";
-import type { DatePickerProps } from "../src/types";
+import { createInitialDatePickerState } from "../../../src/core/state/datepicker-state";
+import { getSystemLocale } from "../../../src/core/locale";
+import type { DatePickerProps } from "../../../src/types";
 
 describe("createInitialDatePickerState", () => {
   it("creates default single-date state from system settings", () => {

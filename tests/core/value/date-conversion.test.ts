@@ -5,8 +5,8 @@ import {
   getLocalTimeZone,
 } from "@internationalized/date";
 
-import { getCalendarAdapter } from "../src/core/adapters";
-import { normalizeDate, toDate } from "../src/core/value";
+import { getCalendarAdapter } from "../../../src/core/adapters";
+import { normalizeDate, toDate } from "../../../src/core/value";
 
 describe("date conversion", () => {
   it("converts JavaScript Date to Gregorian CalendarDate", () => {
@@ -26,7 +26,7 @@ describe("date conversion", () => {
   });
 
   it("converts JavaScript Date to Persian CalendarDate", () => {
-    const adapter = getCalendarAdapter("persian");
+    const adapter = getCalendarAdapter("jalali");
 
     const date = new Date("2026-09-23T00:00:00.000Z");
 
@@ -62,7 +62,7 @@ describe("date conversion", () => {
 
     const source = new CalendarDate(gregorianCalendar, 2026, 9, 23);
 
-    const adapter = getCalendarAdapter("persian");
+    const adapter = getCalendarAdapter("jalali");
 
     const result = normalizeDate(source, adapter, {
       timeZone: "UTC",
@@ -98,7 +98,7 @@ describe("date conversion", () => {
 
     const source = new CalendarDate(persianCalendar, 1405, 7, 1);
 
-    const adapter = getCalendarAdapter("persian");
+    const adapter = getCalendarAdapter("jalali");
 
     const result = toDate(source, adapter, {
       timeZone: "UTC",
@@ -134,7 +134,7 @@ describe("date conversion", () => {
 
     const source = new CalendarDate(persianCalendar, 1405, 7, 1);
 
-    const adapter = getCalendarAdapter("persian");
+    const adapter = getCalendarAdapter("jalali");
 
     const utcDate = toDate(source, adapter, {
       timeZone: "UTC",
@@ -180,7 +180,7 @@ describe("date conversion", () => {
 
     const source = new CalendarDate(persianCalendar, 1405, 7, 1);
 
-    const adapter = getCalendarAdapter("persian");
+    const adapter = getCalendarAdapter("jalali");
 
     const implicitResult = toDate(source, adapter);
 

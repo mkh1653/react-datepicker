@@ -2,7 +2,7 @@ import type { CalendarDate } from "@internationalized/date";
 import type {
   PartialDateRange,
   MultipleRangeSelection,
-} from "../src/core/types/selection";
+} from "../../src/core/types/selection";
 
 const date = {} as CalendarDate;
 

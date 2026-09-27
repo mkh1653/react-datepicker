@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { CalendarDate } from "@internationalized/date";
 
-import { getCalendarAdapter } from "../src/core/adapters";
-import { selectDate } from "../src/core/selection";
-import type { DateConstraints } from "../src/core/constraints";
+import { getCalendarAdapter } from "../../../src/core/adapters";
+import { selectDate } from "../../../src/core/selection";
+import type { DateConstraints } from "../../../src/core/constraints";
 import type {
   MultipleRangeSelection,
   SelectionInput,
-} from "../src/core/types/selection";
+} from "../../../src/core/types/selection";
 
 describe("selectDate", () => {
   const adapter = getCalendarAdapter("gregorian");

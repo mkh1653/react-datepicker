@@ -6,7 +6,7 @@ import type {
   DateRangeOutput,
   MultipleDateOutput,
   MultipleRangeOutput,
-} from "../src/types";
+} from "../../src/types";
 
 const date = new Date();
 const calendarDate = {} as CalendarDate;

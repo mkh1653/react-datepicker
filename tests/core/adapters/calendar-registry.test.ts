@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { getCalendarAdapter } from "../src/core/adapters";
+import { getCalendarAdapter } from "../../../src/core/adapters";
+import { InternationalizedDateAdapter } from "../../../src/core/adapters";
 
 describe("calendar registry", () => {
   it("returns a Gregorian adapter", () => {
@@ -10,9 +11,9 @@ describe("calendar registry", () => {
   });
 
   it("returns a Persian adapter", () => {
-    const adapter = getCalendarAdapter("persian");
+    const adapter = getCalendarAdapter("jalali");
 
-    expect(adapter.type).toBe("persian");
+    expect(adapter.type).toBe("jalali");
     expect(adapter.identifier).toBe("persian");
   });
 
@@ -24,9 +25,16 @@ describe("calendar registry", () => {
   });
 
   it("reuses the same adapter", () => {
-    const first = getCalendarAdapter("persian");
-    const second = getCalendarAdapter("persian");
+    const first = getCalendarAdapter("jalali");
+    const second = getCalendarAdapter("jalali");
 
     expect(first).toBe(second);
+  });
+
+  it("maps jalali to the persian calendar identifier", () => {
+    const adapter = getCalendarAdapter("jalali");
+
+    expect(adapter.type).toBe("jalali");
+    expect(adapter.identifier).toBe("persian");
   });
 });

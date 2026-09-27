@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { CalendarDate, createCalendar } from "@internationalized/date";
-import { getCalendarAdapter } from "../src/core/adapters";
+import { getCalendarAdapter } from "../../../src/core/adapters";
 
 describe("calendar adapter", () => {
   describe("getWeekdayName", () => {
@@ -18,7 +18,7 @@ describe("calendar adapter", () => {
       expect(gregorianAdapter.getWeekdayName(1, "fr-FR")).toBe("mardi");
       expect(gregorianAdapter.getWeekdayName(2, "fr-FR")).toBe("mercredi");
 
-      const persianAdapter = getCalendarAdapter("persian");
+      const persianAdapter = getCalendarAdapter("jalali");
 
       // fa-IR → Saturday is the first day of the week
       expect(persianAdapter.getWeekdayName(0, "fa-IR")).toBe("شنبه");
@@ -45,7 +45,7 @@ describe("calendar adapter", () => {
       );
       expect(gregorianAdapter.getWeekdayName(1, "en-US", "sat")).toBe("Sunday");
 
-      const persianAdapter = getCalendarAdapter("persian");
+      const persianAdapter = getCalendarAdapter("jalali");
 
       // Explicit Sunday-first should override fa-IR default.
       expect(persianAdapter.getWeekdayName(0, "fa-IR", "sun")).toBe("یکشنبه");
@@ -82,7 +82,7 @@ describe("calendar adapter", () => {
   });
   
   it("always formats using the adapter calendar", () => {
-    const adapter = getCalendarAdapter("persian");
+    const adapter = getCalendarAdapter("jalali");
 
     const date = new CalendarDate(createCalendar("persian"), 1405, 7, 1);
 

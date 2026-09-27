@@ -2,7 +2,7 @@ import { CalendarDate } from "@internationalized/date";
 
 import { describe, expect, it } from "vitest";
 
-import { getCalendarAdapter } from "../src/core/adapters";
+import { getCalendarAdapter } from "../../../src/core/adapters";
 
 import {
   getCompletedRange,
@@ -11,7 +11,7 @@ import {
   selectRangeDate,
   selectSingle,
   toggleMultiple,
-} from "../src/core/selection";
+} from "../../../src/core/selection";
 
 describe("selection engine", () => {
   const adapter = getCalendarAdapter("gregorian");

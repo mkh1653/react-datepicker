@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { getSystemLocale } from "../src/core/locale/system-locale";
+import { getSystemLocale } from "../../../src/core/locale/system-locale";
 
 const resolvedOptionsSpy = vi.spyOn(
   Intl.DateTimeFormat.prototype,
