@@ -142,3 +142,19 @@ export function isDateSelected(
       );
   }
 }
+
+export function isSelectionComplete(selection: SelectionInput): boolean {
+  switch (selection.mode) {
+    case "single":
+      return selection.value !== null;
+
+    case "multiple":
+      return false;
+
+    case "range":
+      return selection.value.end !== null;
+
+    case "multiple-range":
+      return false;
+  }
+}

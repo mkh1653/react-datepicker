@@ -8,6 +8,7 @@ import {
   getCompletedRange,
   isDateInRange,
   isDateSelected,
+  isSelectionComplete,
   selectRangeDate,
   selectSingle,
   toggleMultiple,
@@ -219,6 +220,10 @@ describe("selection engine", () => {
               end: new CalendarDate(2026, 9, 20),
             },
           ],
+          pendingRange: {
+            start: null,
+            end: null,
+          },
         },
         adapter,
       ),
@@ -281,6 +286,10 @@ describe("selection engine", () => {
               end: new CalendarDate(2026, 9, 20),
             },
           ],
+          pendingRange: {
+            start: null,
+            end: null,
+          },
         },
         adapter,
       ),
@@ -303,5 +312,78 @@ describe("selection engine", () => {
     );
 
     expect(result).toBe(false);
+  });
+});
+
+describe("isSelectionComplete", () => {
+  it("returns true for a selected single date", () => {
+    const date = new CalendarDate(2026, 9, 15);
+
+    expect(
+      isSelectionComplete({
+        mode: "single",
+        value: date,
+      }),
+    ).toBe(true);
+  });
+
+  it("returns false for an empty single selection", () => {
+    expect(
+      isSelectionComplete({
+        mode: "single",
+        value: null,
+      }),
+    ).toBe(false);
+  });
+
+  it("returns true for a completed range", () => {
+    expect(
+      isSelectionComplete({
+        mode: "range",
+        value: {
+          start: new CalendarDate(2026, 9, 10),
+          end: new CalendarDate(2026, 9, 20),
+        },
+      }),
+    ).toBe(true);
+  });
+
+  it("returns false for a partial range", () => {
+    expect(
+      isSelectionComplete({
+        mode: "range",
+        value: {
+          start: new CalendarDate(2026, 9, 10),
+          end: null,
+        },
+      }),
+    ).toBe(false);
+  });
+
+  it("returns false for multiple selection", () => {
+    expect(
+      isSelectionComplete({
+        mode: "multiple",
+        value: [new CalendarDate(2026, 9, 10)],
+      }),
+    ).toBe(false);
+  });
+
+  it("returns false for multiple-range selection", () => {
+    expect(
+      isSelectionComplete({
+        mode: "multiple-range",
+        value: [
+          {
+            start: new CalendarDate(2026, 9, 10),
+            end: new CalendarDate(2026, 9, 20),
+          },
+        ],
+        pendingRange: {
+          start: null,
+          end: null,
+        },
+      }),
+    ).toBe(false);
   });
 });
