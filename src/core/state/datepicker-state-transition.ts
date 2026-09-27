@@ -13,6 +13,12 @@ export type DatePickerStateAction =
       type: "change-visible-date";
       amount: number;
       unit: VisibleDateChangeUnit;
+    }
+  | {
+      type: "open";
+    }
+  | {
+      type: "close";
     };
 
 export function transitionDatePickerState(
@@ -40,6 +46,18 @@ export function transitionDatePickerState(
           action.unit,
           state.adapter,
         ),
+      };
+
+    case "open":
+      return {
+        ...state,
+        open: true,
+      };
+
+    case "close":
+      return {
+        ...state,
+        open: false,
       };
   }
 }

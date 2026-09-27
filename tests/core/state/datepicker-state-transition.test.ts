@@ -136,6 +136,67 @@ describe("transitionDatePickerState", () => {
     expect(result.open).toBe(state.open);
   });
 
+  it("opens the date picker", () => {
+    const state = createInitialDatePickerState({
+      calendar: "gregorian",
+      locale: "en-US",
+      timeZone: "UTC",
+      defaultOpen: false,
+    });
+
+    const action: DatePickerStateAction = {
+      type: "open",
+    };
+
+    const result = transitionDatePickerState(state, action);
+
+    expect(result.open).toBe(true);
+  });
+
+  it("closes the date picker", () => {
+    const state = createInitialDatePickerState({
+      calendar: "gregorian",
+      locale: "en-US",
+      timeZone: "UTC",
+      defaultOpen: true,
+    });
+
+    const action: DatePickerStateAction = {
+      type: "close",
+    };
+
+    const result = transitionDatePickerState(state, action);
+
+    expect(result.open).toBe(false);
+  });
+
+  it("does not change other state when opening or closing", () => {
+    const state = createInitialDatePickerState({
+      calendar: "gregorian",
+      locale: "en-US",
+      timeZone: "UTC",
+      defaultOpen: false,
+    });
+
+    const opened = transitionDatePickerState(state, {
+      type: "open",
+    });
+
+    expect(opened.selection).toEqual(state.selection);
+    expect(opened.visibleDate).toEqual(state.visibleDate);
+    expect(opened.today).toEqual(state.today);
+    expect(opened.constraints).toEqual(state.constraints);
+
+    const closed = transitionDatePickerState(opened, {
+      type: "close",
+    });
+
+    expect(closed.selection).toEqual(state.selection);
+    expect(closed.visibleDate).toEqual(state.visibleDate);
+    expect(closed.today).toEqual(state.today);
+    expect(closed.constraints).toEqual(state.constraints);
+  });
+
   it("does not mutate the previous state", () => {
     const state = createInitialDatePickerState({
       calendar: "gregorian",
