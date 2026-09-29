@@ -1,19 +1,31 @@
 import { describe, expect, it } from "vitest";
-import { CalendarDate } from "@internationalized/date";
+import { act, renderHook } from "@testing-library/react";
 
-import { createInitialDatePickerState } from "../../../src/core/state";
+import { CalendarDate } from "@internationalized/date";
+import { DatePickerProps } from "../../../src/types";
 import {
+  createInitialDatePickerState,
+  createInitialDatePickerContext,
   transitionDatePickerState,
   type DatePickerStateAction,
+  useDatePickerState,
 } from "../../../src/core/state";
 
 describe("transitionDatePickerState", () => {
   it("selects a date in single mode", () => {
-    const state = createInitialDatePickerState({
+    const context = createInitialDatePickerContext({
       calendar: "gregorian",
       locale: "en-US",
       timeZone: "UTC",
     });
+    const state = createInitialDatePickerState(
+      {
+        calendar: "gregorian",
+        locale: "en-US",
+        timeZone: "UTC",
+      },
+      context,
+    );
 
     const date = new CalendarDate(2026, 9, 15);
 
@@ -22,7 +34,7 @@ describe("transitionDatePickerState", () => {
       date,
     };
 
-    const result = transitionDatePickerState(state, action);
+    const result = transitionDatePickerState(state, action, context);
 
     expect(result.selection).toEqual({
       mode: "single",
@@ -37,20 +49,24 @@ describe("transitionDatePickerState", () => {
     const firstDate = new CalendarDate(2026, 9, 10);
     const secondDate = new CalendarDate(2026, 9, 15);
 
-    const state = createInitialDatePickerState({
+    const props: DatePickerProps = {
       calendar: "gregorian",
       locale: "en-US",
       timeZone: "UTC",
       selectionMode: "multiple",
       defaultValue: [firstDate],
-    });
+    };
+
+    const context = createInitialDatePickerContext(props);
+
+    const state = createInitialDatePickerState(props, context);
 
     const action: DatePickerStateAction = {
       type: "select-date",
       date: secondDate,
     };
 
-    const result = transitionDatePickerState(state, action);
+    const result = transitionDatePickerState(state, action, context);
 
     expect(result.selection).toEqual({
       mode: "multiple",
@@ -61,19 +77,22 @@ describe("transitionDatePickerState", () => {
   it("starts a range in range mode", () => {
     const date = new CalendarDate(2026, 9, 10);
 
-    const state = createInitialDatePickerState({
+    const props: DatePickerProps = {
       calendar: "gregorian",
       locale: "en-US",
       timeZone: "UTC",
       selectionMode: "range",
-    });
+    };
+
+    const context = createInitialDatePickerContext(props);
+    const state = createInitialDatePickerState(props, context);
 
     const action: DatePickerStateAction = {
       type: "select-date",
       date,
     };
 
-    const result = transitionDatePickerState(state, action);
+    const result = transitionDatePickerState(state, action, context);
 
     expect(result.selection).toEqual({
       mode: "range",
@@ -85,21 +104,23 @@ describe("transitionDatePickerState", () => {
   });
 
   it("starts a pending range in multiple-range mode", () => {
-    const date = new CalendarDate(2026, 9, 10);
-
-    const state = createInitialDatePickerState({
+    const props: DatePickerProps = {
       calendar: "gregorian",
       locale: "en-US",
       timeZone: "UTC",
       selectionMode: "multiple-range",
-    });
+    };
+    const context = createInitialDatePickerContext(props);
+    const state = createInitialDatePickerState(props, context);
+
+    const date = new CalendarDate(2026, 9, 10);
 
     const action: DatePickerStateAction = {
       type: "select-date",
       date,
     };
 
-    const result = transitionDatePickerState(state, action);
+    const result = transitionDatePickerState(state, action, context);
 
     expect(result.selection).toEqual({
       mode: "multiple-range",
@@ -113,14 +134,16 @@ describe("transitionDatePickerState", () => {
 
   it("changes visible date without changing selection", () => {
     const selectedDate = new CalendarDate(2026, 9, 10);
-
-    const state = createInitialDatePickerState({
+    const props: DatePickerProps = {
       calendar: "gregorian",
       locale: "en-US",
       timeZone: "UTC",
       value: selectedDate,
       onChange: () => {},
-    });
+    };
+
+    const context = createInitialDatePickerContext(props);
+    const state = createInitialDatePickerState(props, context);
 
     const action: DatePickerStateAction = {
       type: "change-visible-date",
@@ -128,7 +151,7 @@ describe("transitionDatePickerState", () => {
       unit: "month",
     };
 
-    const result = transitionDatePickerState(state, action);
+    const result = transitionDatePickerState(state, action, context);
 
     expect(result.visibleDate).toEqual(new CalendarDate(2026, 10, 1));
 
@@ -137,80 +160,104 @@ describe("transitionDatePickerState", () => {
   });
 
   it("opens the date picker", () => {
-    const state = createInitialDatePickerState({
-      calendar: "gregorian",
-      locale: "en-US",
-      timeZone: "UTC",
-      defaultOpen: false,
+    const { result } = renderHook(() =>
+      useDatePickerState({
+        calendar: "gregorian",
+        locale: "en-US",
+        timeZone: "UTC",
+        defaultOpen: false,
+      }),
+    );
+
+    expect(result.current.state.open).toBe(false);
+
+    act(() => {
+      result.current.dispatch({
+        type: "open",
+      });
     });
 
-    const action: DatePickerStateAction = {
-      type: "open",
-    };
-
-    const result = transitionDatePickerState(state, action);
-
-    expect(result.open).toBe(true);
+    expect(result.current.state.open).toBe(true);
   });
 
   it("closes the date picker", () => {
-    const state = createInitialDatePickerState({
-      calendar: "gregorian",
-      locale: "en-US",
-      timeZone: "UTC",
-      defaultOpen: true,
+    const { result } = renderHook(() =>
+      useDatePickerState({
+        calendar: "gregorian",
+        locale: "en-US",
+        timeZone: "UTC",
+        defaultOpen: true,
+      }),
+    );
+
+    expect(result.current.state.open).toBe(true);
+
+    act(() => {
+      result.current.dispatch({
+        type: "close",
+      });
     });
 
-    const action: DatePickerStateAction = {
-      type: "close",
-    };
-
-    const result = transitionDatePickerState(state, action);
-
-    expect(result.open).toBe(false);
+    expect(result.current.state.open).toBe(false);
   });
 
   it("does not change other state when opening or closing", () => {
-    const state = createInitialDatePickerState({
-      calendar: "gregorian",
-      locale: "en-US",
-      timeZone: "UTC",
-      defaultOpen: false,
+    const selectedDate = new CalendarDate(2026, 9, 10);
+
+    const { result } = renderHook(() =>
+      useDatePickerState({
+        calendar: "gregorian",
+        locale: "en-US",
+        timeZone: "UTC",
+        defaultValue: selectedDate,
+        defaultOpen: false,
+      }),
+    );
+
+    const initialSelection = result.current.state.selection;
+    const initialVisibleDate = result.current.state.visibleDate;
+
+    act(() => {
+      result.current.dispatch({
+        type: "open",
+      });
     });
 
-    const opened = transitionDatePickerState(state, {
-      type: "open",
+    expect(result.current.state.open).toBe(true);
+    expect(result.current.state.selection).toEqual(initialSelection);
+    expect(result.current.state.visibleDate).toEqual(initialVisibleDate);
+
+    act(() => {
+      result.current.dispatch({
+        type: "close",
+      });
     });
 
-    expect(opened.selection).toEqual(state.selection);
-    expect(opened.visibleDate).toEqual(state.visibleDate);
-    expect(opened.today).toEqual(state.today);
-    expect(opened.constraints).toEqual(state.constraints);
-
-    const closed = transitionDatePickerState(opened, {
-      type: "close",
-    });
-
-    expect(closed.selection).toEqual(state.selection);
-    expect(closed.visibleDate).toEqual(state.visibleDate);
-    expect(closed.today).toEqual(state.today);
-    expect(closed.constraints).toEqual(state.constraints);
+    expect(result.current.state.open).toBe(false);
+    expect(result.current.state.selection).toEqual(initialSelection);
+    expect(result.current.state.visibleDate).toEqual(initialVisibleDate);
   });
 
   it("does not mutate the previous state", () => {
-    const state = createInitialDatePickerState({
+    const props: DatePickerProps = {
       calendar: "gregorian",
       locale: "en-US",
       timeZone: "UTC",
-    });
+    };
+    const context = createInitialDatePickerContext(props);
+    const state = createInitialDatePickerState(props, context);
 
     const originalVisibleDate = state.visibleDate;
 
-    const result = transitionDatePickerState(state, {
-      type: "change-visible-date",
-      amount: 1,
-      unit: "month",
-    });
+    const result = transitionDatePickerState(
+      state,
+      {
+        type: "change-visible-date",
+        amount: 1,
+        unit: "month",
+      },
+      context,
+    );
 
     expect(result).not.toBe(state);
     expect(result.visibleDate).not.toBe(originalVisibleDate);
@@ -218,20 +265,26 @@ describe("transitionDatePickerState", () => {
   });
 
   it("closes after selecting a single date when closeOnSelect is enabled", () => {
-    const state = createInitialDatePickerState({
+    const props: DatePickerProps = {
       calendar: "gregorian",
       locale: "en-US",
       timeZone: "UTC",
       closeOnSelect: true,
       defaultOpen: true,
-    });
+    };
+    const context = createInitialDatePickerContext(props);
+    const state = createInitialDatePickerState(props, context);
 
     const date = new CalendarDate(2026, 9, 15);
 
-    const result = transitionDatePickerState(state, {
-      type: "select-date",
-      date,
-    });
+    const result = transitionDatePickerState(
+      state,
+      {
+        type: "select-date",
+        date,
+      },
+      context,
+    );
 
     expect(result.selection).toEqual({
       mode: "single",
@@ -242,40 +295,52 @@ describe("transitionDatePickerState", () => {
   });
 
   it("keeps the date picker open when closeOnSelect is disabled", () => {
-    const state = createInitialDatePickerState({
+    const props: DatePickerProps = {
       calendar: "gregorian",
       locale: "en-US",
       timeZone: "UTC",
       closeOnSelect: false,
       defaultOpen: true,
-    });
+    };
+    const context = createInitialDatePickerContext(props);
+    const state = createInitialDatePickerState(props, context);
 
     const date = new CalendarDate(2026, 9, 15);
 
-    const result = transitionDatePickerState(state, {
-      type: "select-date",
-      date,
-    });
+    const result = transitionDatePickerState(
+      state,
+      {
+        type: "select-date",
+        date,
+      },
+      context,
+    );
 
     expect(result.open).toBe(true);
   });
 
   it("keeps the range picker open after the first range click", () => {
-    const state = createInitialDatePickerState({
+    const props: DatePickerProps = {
       calendar: "gregorian",
       locale: "en-US",
       timeZone: "UTC",
       selectionMode: "range",
       closeOnSelect: true,
       defaultOpen: true,
-    });
+    };
+    const context = createInitialDatePickerContext(props);
+    const state = createInitialDatePickerState(props, context);
 
     const start = new CalendarDate(2026, 9, 10);
 
-    const result = transitionDatePickerState(state, {
-      type: "select-date",
-      date: start,
-    });
+    const result = transitionDatePickerState(
+      state,
+      {
+        type: "select-date",
+        date: start,
+      },
+      context,
+    );
 
     expect(result.selection).toEqual({
       mode: "range",
@@ -290,8 +355,7 @@ describe("transitionDatePickerState", () => {
 
   it("closes the range picker after the range is completed", () => {
     const start = new CalendarDate(2026, 9, 10);
-
-    const state = createInitialDatePickerState({
+    const props: DatePickerProps = {
       calendar: "gregorian",
       locale: "en-US",
       timeZone: "UTC",
@@ -302,14 +366,20 @@ describe("transitionDatePickerState", () => {
         start,
         end: null,
       },
-    });
+    };
+    const context = createInitialDatePickerContext(props);
+    const state = createInitialDatePickerState(props, context);
 
     const end = new CalendarDate(2026, 9, 20);
 
-    const result = transitionDatePickerState(state, {
-      type: "select-date",
-      date: end,
-    });
+    const result = transitionDatePickerState(
+      state,
+      {
+        type: "select-date",
+        date: end,
+      },
+      context,
+    );
 
     expect(result.selection).toEqual({
       mode: "range",
@@ -323,48 +393,62 @@ describe("transitionDatePickerState", () => {
   });
 
   it("keeps multiple selection open after selecting a date", () => {
-    const state = createInitialDatePickerState({
+    const props: DatePickerProps = {
       calendar: "gregorian",
       locale: "en-US",
       timeZone: "UTC",
       selectionMode: "multiple",
       closeOnSelect: true,
       defaultOpen: true,
-    });
+    };
+    const context = createInitialDatePickerContext(props);
+    const state = createInitialDatePickerState(props, context);
 
     const date = new CalendarDate(2026, 9, 15);
 
-    const result = transitionDatePickerState(state, {
-      type: "select-date",
-      date,
-    });
+    const result = transitionDatePickerState(
+      state,
+      {
+        type: "select-date",
+        date,
+      },
+      context,
+    );
 
     expect(result.open).toBe(true);
   });
 
   it("keeps multiple-range selection open after completing a range", () => {
-    const start = new CalendarDate(2026, 9, 10);
-
-    const state = createInitialDatePickerState({
+    const props: DatePickerProps = {
       calendar: "gregorian",
       locale: "en-US",
       timeZone: "UTC",
       selectionMode: "multiple-range",
       closeOnSelect: true,
       defaultOpen: true,
-    });
+    };
+    const context = createInitialDatePickerContext(props);
+    const state = createInitialDatePickerState(props, context);
 
-    const first = transitionDatePickerState(state, {
-      type: "select-date",
-      date: start,
-    });
+    const start = new CalendarDate(2026, 9, 10);
+    const first = transitionDatePickerState(
+      state,
+      {
+        type: "select-date",
+        date: start,
+      },
+      context,
+    );
 
     const end = new CalendarDate(2026, 9, 20);
-
-    const result = transitionDatePickerState(first, {
-      type: "select-date",
-      date: end,
-    });
+    const result = transitionDatePickerState(
+      first,
+      {
+        type: "select-date",
+        date: end,
+      },
+      context,
+    );
 
     expect(result.selection).toEqual({
       mode: "multiple-range",
@@ -387,7 +471,7 @@ describe("transitionDatePickerState", () => {
     const selectedDate = new CalendarDate(2026, 9, 10);
     const disabledDate = new CalendarDate(2026, 9, 15);
 
-    const state = createInitialDatePickerState({
+    const props: DatePickerProps = {
       calendar: "gregorian",
       locale: "en-US",
       timeZone: "UTC",
@@ -396,12 +480,19 @@ describe("transitionDatePickerState", () => {
       onChange: () => {},
       disabledDates: [disabledDate],
       defaultOpen: true,
-    });
+    };
 
-    const result = transitionDatePickerState(state, {
-      type: "select-date",
-      date: disabledDate,
-    });
+    const context = createInitialDatePickerContext(props);
+    const state = createInitialDatePickerState(props, context);
+
+    const result = transitionDatePickerState(
+      state,
+      {
+        type: "select-date",
+        date: disabledDate,
+      },
+      context,
+    );
 
     expect(result.selection).toEqual(state.selection);
     expect(result.open).toBe(true);
@@ -413,19 +504,26 @@ describe("select-calendar-date", () => {
     const visibleDate = new CalendarDate(2026, 9, 15);
     const selectedDate = new CalendarDate(2026, 9, 20);
 
-    const state = createInitialDatePickerState({
+    const props: DatePickerProps = {
       calendar: "gregorian",
       locale: "en-US",
       timeZone: "UTC",
       value: visibleDate,
       onChange: () => {},
       defaultVisibleDate: visibleDate,
-    });
+    };
 
-    const result = transitionDatePickerState(state, {
-      type: "select-calendar-date",
-      date: selectedDate,
-    });
+    const context = createInitialDatePickerContext(props);
+    const state = createInitialDatePickerState(props, context);
+
+    const result = transitionDatePickerState(
+      state,
+      {
+        type: "select-calendar-date",
+        date: selectedDate,
+      },
+      context,
+    );
 
     expect(result.selection).toEqual({
       mode: "single",
@@ -439,19 +537,26 @@ describe("select-calendar-date", () => {
     const visibleDate = new CalendarDate(2026, 9, 15);
     const selectedDate = new CalendarDate(2026, 10, 1);
 
-    const state = createInitialDatePickerState({
+    const props: DatePickerProps = {
       calendar: "gregorian",
       locale: "en-US",
       timeZone: "UTC",
       value: visibleDate,
       onChange: () => {},
       defaultVisibleDate: visibleDate,
-    });
+    };
 
-    const result = transitionDatePickerState(state, {
-      type: "select-calendar-date",
-      date: selectedDate,
-    });
+    const context = createInitialDatePickerContext(props);
+    const state = createInitialDatePickerState(props, context);
+
+    const result = transitionDatePickerState(
+      state,
+      {
+        type: "select-calendar-date",
+        date: selectedDate,
+      },
+      context,
+    );
 
     expect(result.visibleDate).toEqual(selectedDate);
 
@@ -465,19 +570,26 @@ describe("select-calendar-date", () => {
     const visibleDate = new CalendarDate(2026, 9, 15);
     const selectedDate = new CalendarDate(2026, 8, 31);
 
-    const state = createInitialDatePickerState({
+    const props: DatePickerProps = {
       calendar: "gregorian",
       locale: "en-US",
       timeZone: "UTC",
       value: visibleDate,
       onChange: () => {},
       defaultVisibleDate: visibleDate,
-    });
+    };
 
-    const result = transitionDatePickerState(state, {
-      type: "select-calendar-date",
-      date: selectedDate,
-    });
+    const context = createInitialDatePickerContext(props);
+    const state = createInitialDatePickerState(props, context);
+
+    const result = transitionDatePickerState(
+      state,
+      {
+        type: "select-calendar-date",
+        date: selectedDate,
+      },
+      context,
+    );
 
     expect(result.visibleDate).toEqual(new CalendarDate(2026, 8, 1));
 
@@ -491,7 +603,7 @@ describe("select-calendar-date", () => {
     const visibleDate = new CalendarDate(2026, 9, 15);
     const disabledDate = new CalendarDate(2026, 10, 1);
 
-    const state = createInitialDatePickerState({
+    const props: DatePickerProps = {
       calendar: "gregorian",
       locale: "en-US",
       timeZone: "UTC",
@@ -500,12 +612,19 @@ describe("select-calendar-date", () => {
       defaultVisibleDate: visibleDate,
       disabledDates: [disabledDate],
       defaultOpen: true,
-    });
+    };
 
-    const result = transitionDatePickerState(state, {
-      type: "select-calendar-date",
-      date: disabledDate,
-    });
+    const context = createInitialDatePickerContext(props);
+    const state = createInitialDatePickerState(props, context);
+
+    const result = transitionDatePickerState(
+      state,
+      {
+        type: "select-calendar-date",
+        date: disabledDate,
+      },
+      context,
+    );
 
     expect(result.visibleDate).toEqual(new CalendarDate(2026, 9, 1));
     expect(result.selection).toEqual(state.selection);

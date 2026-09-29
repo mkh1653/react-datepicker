@@ -2,6 +2,7 @@ import type { CalendarDate } from "@internationalized/date";
 
 import { changeVisibleDate, type VisibleDateChangeUnit } from "../calendar";
 import { selectDate, isSelectionComplete } from "../selection";
+import type { DatePickerContext } from "./datepicker-context";
 import type { DatePickerState } from "./datepicker-state";
 import { isDateDisabled } from "../constraints";
 
@@ -29,24 +30,25 @@ export type DatePickerStateAction =
 export function transitionDatePickerState(
   state: DatePickerState,
   action: DatePickerStateAction,
+  context: DatePickerContext
 ): DatePickerState {
   switch (action.type) {
     case "select-date":
-      if (isDateDisabled(action.date, state.constraints, state.adapter)) {
+      if (isDateDisabled(action.date, context.constraints, context.adapter)) {
         return state;
       }
       const selection = selectDate(
         state.selection,
         action.date,
-        state.adapter,
-        state.constraints,
+        context.adapter,
+        context.constraints,
       );
 
       return {
         ...state,
         selection,
         open:
-          state.closeOnSelect && isSelectionComplete(selection)
+          context.closeOnSelect && isSelectionComplete(selection)
             ? false
             : state.open,
       };
@@ -58,7 +60,7 @@ export function transitionDatePickerState(
           state.visibleDate,
           action.amount,
           action.unit,
-          state.adapter,
+          context.adapter,
         ),
       };
 
@@ -73,23 +75,24 @@ export function transitionDatePickerState(
         ...state,
         open: false,
       };
+      
     case "select-calendar-date": {
-      if (isDateDisabled(action.date, state.constraints, state.adapter)) {
+      if (isDateDisabled(action.date, context.constraints, context.adapter)) {
         return state;
       }
 
-      const visibleDate = state.adapter.isSameMonth(
+      const visibleDate = context.adapter.isSameMonth(
         state.visibleDate,
         action.date,
       )
         ? state.visibleDate
-        : state.adapter.getStartOfMonth(action.date);
+        : context.adapter.getStartOfMonth(action.date);
 
       const selection = selectDate(
         state.selection,
         action.date,
-        state.adapter,
-        state.constraints,
+        context.adapter,
+        context.constraints,
       );
 
       return {
@@ -97,7 +100,7 @@ export function transitionDatePickerState(
         visibleDate,
         selection,
         open:
-          state.closeOnSelect && isSelectionComplete(selection)
+          context.closeOnSelect && isSelectionComplete(selection)
             ? false
             : state.open,
       };

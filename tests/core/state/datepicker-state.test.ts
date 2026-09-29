@@ -1,20 +1,25 @@
 import { describe, expect, it } from "vitest";
 import { CalendarDate, today } from "@internationalized/date";
 
-import { createInitialDatePickerState } from "../../../src/core/state/datepicker-state";
 import { getSystemLocale } from "../../../src/core/locale";
 import type { DatePickerProps } from "../../../src/types";
+import {
+  createInitialDatePickerContext,
+  createInitialDatePickerState,
+} from "../../../src/core/state";
 
 describe("createInitialDatePickerState", () => {
   it("creates default single-date state from system settings", () => {
     const system = getSystemLocale();
-    const state = createInitialDatePickerState({});
+
+    const context = createInitialDatePickerContext({});
+    const state = createInitialDatePickerState({}, context);
 
     expect(state.open).toBe(false);
 
-    expect(state.locale).toBe(system.locale);
-    expect(state.timeZone).toBe(system.timeZone);
-    expect(state.adapter.type).toBe(system.calendar);
+    expect(context.locale).toBe(system.locale);
+    expect(context.timeZone).toBe(system.timeZone);
+    expect(context.adapter.type).toBe(system.calendar);
 
     expect(state.selection).toEqual({
       mode: "single",
@@ -22,9 +27,9 @@ describe("createInitialDatePickerState", () => {
     });
 
     expect(state.visibleDate).toEqual(
-      state.adapter.getStartOfMonth(state.today),
+      context.adapter.getStartOfMonth(context.today),
     );
-    expect(state.constraints).toEqual({});
+    expect(context.constraints).toEqual({});
   });
 
   it("uses the selected date as the initial visible date", () => {
@@ -59,15 +64,15 @@ describe("createInitialDatePickerState", () => {
   });
 
   it("uses explicit locale, calendar and timezone over system settings", () => {
-    const state = createInitialDatePickerState({
+    const context = createInitialDatePickerContext({
       calendar: "gregorian",
       locale: "en-US",
       timeZone: "America/New_York",
     });
 
-    expect(state.locale).toBe("en-US");
-    expect(state.timeZone).toBe("America/New_York");
-    expect(state.adapter.type).toBe("gregorian");
+    expect(context.locale).toBe("en-US");
+    expect(context.timeZone).toBe("America/New_York");
+    expect(context.adapter.type).toBe("gregorian");
   });
 
   it("initializes multiple selection from defaultValue", () => {

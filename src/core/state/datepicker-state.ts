@@ -1,11 +1,15 @@
 import type { CalendarDate } from "@internationalized/date";
 
 import { normalizeDateConstraints, type DateConstraints } from "../constraints";
-import { resolveInitialVisibleDate } from "../calendar";
-import type { SelectionInput } from "../types/selection";
+import {
+  createInitialDatePickerContext,
+  type DatePickerContext,
+} from "./datepicker-context";
 import { getSystemLocale } from "../locale/system-locale";
-import type { CalendarAdapter } from "../adapters";
+import type { SelectionInput } from "../types/selection";
+import { resolveInitialVisibleDate } from "../calendar";
 import type { DatePickerProps } from "../../types";
+import type { CalendarAdapter } from "../adapters";
 import { getCalendarAdapter } from "../adapters";
 import { normalizeDate } from "../value";
 
@@ -17,19 +21,9 @@ import {
 } from "../selection";
 
 export interface DatePickerState {
-  adapter: CalendarAdapter;
-  locale: string;
-  timeZone: string;
-
-  today: CalendarDate;
   visibleDate: CalendarDate;
-
   selection: SelectionInput;
-
-  constraints: DateConstraints;
-
   open: boolean;
-  closeOnSelect: boolean;
 }
 
 function getInitialSelection(
@@ -114,50 +108,28 @@ function getInitialVisibleDate(
 
 export function createInitialDatePickerState(
   props: DatePickerProps = {},
+  context: DatePickerContext = createInitialDatePickerContext(props),
 ): DatePickerState {
-  const systemLocale = getSystemLocale();
-  const calendar = props.calendar ?? systemLocale.calendar;
-  const locale = props.locale ?? systemLocale.locale;
-  const timeZone = props.timeZone ?? systemLocale.timeZone;
-
-  const adapter = getCalendarAdapter(calendar);
-
-  const today = adapter.today(timeZone);
-
-  const constraints = normalizeDateConstraints(
-    {
-      minDate: props.minDate,
-      maxDate: props.maxDate,
-      disabledDates: props.disabledDates,
-      isDateDisabled: props.isDateDisabled,
-    },
-    adapter,
-    timeZone,
+  const selection = getInitialSelection(
+    props,
+    context.adapter,
+    context.timeZone,
   );
-
-  const selection = getInitialSelection(props, adapter, timeZone);
 
   const visibleDate = getInitialVisibleDate(
     props,
     selection,
-    today,
-    constraints,
-    adapter,
-    timeZone,
+    context.today,
+    context.constraints,
+    context.adapter,
+    context.timeZone,
   );
 
   const open = "open" in props ? props.open : (props.defaultOpen ?? false);
-  const closeOnSelect = props.closeOnSelect ?? true;
 
   return {
-    adapter,
-    locale,
-    timeZone,
-    today,
     visibleDate,
     selection,
-    constraints,
     open,
-    closeOnSelect,
   };
 }
