@@ -31,6 +31,7 @@ import {
 
 export interface UseDatePickerStateResult {
   state: DatePickerState;
+  context: DatePickerContext;
   dispatch: (action: DatePickerStateAction) => void;
 }
 
@@ -345,6 +346,7 @@ export function useDatePickerState(
 
   return {
     state,
+    context,
     dispatch,
   };
 }

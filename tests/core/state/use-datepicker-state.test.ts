@@ -691,4 +691,18 @@ describe("useDatePickerState", () => {
       "persian",
     );
   });
+
+  it("exposes the current context for UI consumers", () => {
+    const { result } = renderHook(() =>
+      useDatePickerState({
+        calendar: "jalali",
+        locale: "fa-IR",
+        timeZone: "UTC",
+      }),
+    );
+
+    expect(result.current.context.adapter.identifier).toBe("persian");
+    expect(result.current.context.locale).toBe("fa-IR");
+    expect(result.current.context.timeZone).toBe("UTC");
+  });
 });
