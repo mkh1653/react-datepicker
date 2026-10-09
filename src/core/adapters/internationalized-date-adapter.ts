@@ -78,9 +78,11 @@ export class InternationalizedDateAdapter implements CalendarAdapter {
       days: weekday,
     });
 
+    const weekdayStyle = /^fa(?:-|$)/i.test(locale) ? "narrow" : "short";
+
     const formatter = new Intl.DateTimeFormat(locale, {
       calendar: this.identifier,
-      weekday: "long",
+      weekday: weekdayStyle,
       timeZone: "UTC",
     });
 

@@ -15,3 +15,5 @@ export type MultipleDateOutput = Date[];
 
 export type MultipleRangeInput = DateRange<DateInput>[];
 export type MultipleRangeOutput = DateRange<Date>[];
+
+export type DatePickerDisplayMode = "popup" | "dropdown";

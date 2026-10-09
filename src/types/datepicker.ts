@@ -9,6 +9,7 @@ import type {
   MultipleDateOutput,
   MultipleRangeInput,
   MultipleRangeOutput,
+  DatePickerDisplayMode,
 } from "./public";
 
 export interface DatePickerCommonProps {
@@ -35,6 +36,8 @@ export interface DatePickerCommonProps {
   readOnly?: boolean;
 
   children?: ReactNode;
+
+  displayMode?: DatePickerDisplayMode;
 }
 
 interface ControlledOpenProps {

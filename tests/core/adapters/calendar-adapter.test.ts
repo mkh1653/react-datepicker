@@ -55,6 +55,16 @@ describe("calendar adapter", () => {
       expect(persianAdapter.getWeekdayName(0, "fa-IR", "sat")).toBe("شنبه");
       expect(persianAdapter.getWeekdayName(1, "fa-IR", "sat")).toBe("یکشنبه");
     });
+
+    it("uses compact weekday labels for Persian locale", () => {
+      const adapter = getCalendarAdapter("jalali");
+
+      const labels = Array.from({ length: 7 }, (_, index) =>
+        adapter.getWeekdayName(index, "fa-IR"),
+      );
+
+      expect(labels).toEqual(["ش", "ی", "د", "س", "چ", "پ", "ج"]);
+    });
   });
 
   it("formats calendar dates independently of the runtime timezone", () => {
@@ -80,7 +90,7 @@ describe("calendar adapter", () => {
       vi.unstubAllEnvs();
     }
   });
-  
+
   it("always formats using the adapter calendar", () => {
     const adapter = getCalendarAdapter("jalali");
 
