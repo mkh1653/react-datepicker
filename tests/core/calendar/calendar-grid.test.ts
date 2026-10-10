@@ -52,7 +52,7 @@ describe("createCalendarGrid", () => {
   });
 
   it("works with Persian calendar", () => {
-    const adapter = getCalendarAdapter("islamic");
+    const adapter = getCalendarAdapter("jalali");
 
     const persianCalendar = createCalendar("persian");
 

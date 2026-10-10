@@ -25,6 +25,10 @@ export function Calendar({ state, context, dispatch }: CalendarProps) {
   const { adapter, locale } = context;
   const visibleDate = state.visibleDate;
 
+  const previousArrow = context.direction === "rtl" ? "›" : "‹";
+
+  const nextArrow = context.direction === "rtl" ? "‹" : "›";
+
   const monthLabel = adapter.format(visibleDate, locale, {
     month: "long",
   });
@@ -103,6 +107,7 @@ export function Calendar({ state, context, dispatch }: CalendarProps) {
   return (
     <div
       data-testid='calendar'
+      dir={context.direction}
       className='flex h-[23rem] w-full min-w-0 flex-col'>
       {view === "days" && (
         <>
@@ -110,6 +115,7 @@ export function Calendar({ state, context, dispatch }: CalendarProps) {
             monthLabel={monthLabel}
             yearLabel={yearLabel}
             fullMonthLabel={fullMonthLabel}
+            direction={context.direction}
             locale={locale}
             onPreviousMonth={() =>
               dispatch({
@@ -152,7 +158,7 @@ export function Calendar({ state, context, dispatch }: CalendarProps) {
               aria-label={labels.back}
               onClick={() => setView("days")}
               className='datepicker-nav-button'>
-              ‹
+              x
             </button>
 
             <button
@@ -204,7 +210,7 @@ export function Calendar({ state, context, dispatch }: CalendarProps) {
               aria-label={labels.previousYears}
               onClick={() => setYearRangeOffset((offset) => offset - 1)}
               className='datepicker-nav-button'>
-              ‹
+              {previousArrow}
             </button>
 
             <h2 className='text-sm font-semibold'>
@@ -217,7 +223,7 @@ export function Calendar({ state, context, dispatch }: CalendarProps) {
               aria-label={labels.nextYears}
               onClick={() => setYearRangeOffset((offset) => offset + 1)}
               className='datepicker-nav-button'>
-              ›
+              {nextArrow}
             </button>
           </div>
 

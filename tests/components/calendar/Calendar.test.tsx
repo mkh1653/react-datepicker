@@ -155,7 +155,9 @@ describe("Calendar", () => {
 
     expect(context.adapter.identifier).toBe("persian");
 
-    expect(screen.getByText(new Intl.NumberFormat("fa-IR").format(15)),).toBeInTheDocument();
+    expect(
+      screen.getByText(new Intl.NumberFormat("fa-IR").format(15)),
+    ).toBeInTheDocument();
   });
 
   it("disables dates from disabledDates and prevents selection", async () => {
@@ -251,5 +253,119 @@ describe("Calendar", () => {
     expect(
       screen.queryByRole("group", { name: "Select year" }),
     ).not.toBeInTheDocument();
+  });
+
+  it.each([
+    {
+      name: "Gregorian calendar with Persian locale",
+      props: {
+        calendar: "gregorian" as const,
+        locale: "fa-IR",
+        timeZone: "UTC",
+        defaultVisibleDate: new CalendarDate(2026, 9, 1),
+      },
+      expected: ["شنب", "یک", "دو", "سه", "چهار", "پنج", "جمع"],
+    },
+    {
+      name: "Jalali calendar with Persian locale",
+      props: {
+        calendar: "jalali" as const,
+        locale: "fa-IR",
+        timeZone: "UTC",
+        defaultVisibleDate: new CalendarDate("persian", 1405, 7, 1),
+      },
+      expected: ["شنب", "یک", "دو", "سه", "چهار", "پنج", "جمع"],
+    },
+    {
+      name: "Gregorian calendar with English locale",
+      props: {
+        calendar: "gregorian" as const,
+        locale: "en-US",
+        timeZone: "UTC",
+        defaultVisibleDate: new CalendarDate(2026, 9, 1),
+      },
+      expected: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    },
+    {
+      name: "Jalali calendar with English locale",
+      props: {
+        calendar: "jalali" as const,
+        locale: "en-US",
+        timeZone: "UTC",
+        defaultVisibleDate: new CalendarDate("persian", 1405, 7, 1),
+      },
+      expected: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    },
+  ])("uses locale-based weekday order: $name", ({ props, expected }) => {
+    const { state, context } = createCalendarState(props);
+
+    render(<Calendar state={state} context={context} dispatch={vi.fn()} />);
+
+    expect(
+      screen.getAllByRole("columnheader").map((item) => item.textContent),
+    ).toEqual(expected);
+  });
+
+  it.each([
+    {
+      name: "defaults to RTL for Persian locale",
+      locale: "fa-IR",
+      requestedDirection: undefined,
+      expectedDirection: "rtl",
+    },
+    {
+      name: "defaults to LTR for English locale",
+      locale: "en-US",
+      requestedDirection: undefined,
+      expectedDirection: "ltr",
+    },
+    {
+      name: "allows LTR with Persian locale",
+      locale: "fa-IR",
+      requestedDirection: "ltr" as const,
+      expectedDirection: "ltr",
+    },
+    {
+      name: "allows RTL with English locale",
+      locale: "en-US",
+      requestedDirection: "rtl" as const,
+      expectedDirection: "rtl",
+    },
+  ])(
+    "sets visual direction: $name",
+    ({ locale, requestedDirection, expectedDirection }) => {
+      const props: DatePickerProps = {
+        calendar: "gregorian",
+        locale,
+        timeZone: "UTC",
+        defaultVisibleDate: new CalendarDate(2026, 9, 1),
+        ...(requestedDirection ? { direction: requestedDirection } : {}),
+      };
+
+      const { state, context } = createCalendarState(props);
+
+      render(<Calendar state={state} context={context} dispatch={vi.fn()} />);
+
+      expect(screen.getByTestId("calendar")).toHaveAttribute(
+        "dir",
+        expectedDirection,
+      );
+    },
+  );
+
+  it("keeps locale weekday order when direction is explicitly LTR", () => {
+    const { state, context } = createCalendarState({
+      calendar: "gregorian",
+      locale: "fa-IR",
+      timeZone: "UTC",
+      direction: "ltr",
+      defaultVisibleDate: new CalendarDate(2026, 9, 1),
+    });
+
+    render(<Calendar state={state} context={context} dispatch={vi.fn()} />);
+
+    expect(
+      screen.getAllByRole("columnheader").map((item) => item.textContent),
+    ).toEqual(["شنب", "یک", "دو", "سه", "چهار", "پنج", "جمع"]);
   });
 });

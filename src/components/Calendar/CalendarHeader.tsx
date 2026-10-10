@@ -6,6 +6,7 @@ interface CalendarHeaderProps {
   onPreviousMonth: () => void;
   onNextMonth: () => void;
   onSelectMonth: () => void;
+  direction: "ltr" | "rtl";
   onSelectYear: () => void;
 }
 
@@ -18,6 +19,7 @@ export function CalendarHeader({
   onNextMonth,
   onSelectMonth,
   onSelectYear,
+  direction,
 }: CalendarHeaderProps) {
   const isPersian = /^fa(?:-|$)/i.test(locale);
 
@@ -28,7 +30,7 @@ export function CalendarHeader({
         aria-label={isPersian ? "ماه قبل" : "Previous month"}
         onClick={onPreviousMonth}
         className='datepicker-nav-button'>
-        <span aria-hidden='true'>‹</span>
+        <span aria-hidden='true'>{direction === "rtl" ? "›" : "‹"}</span>
       </button>
 
       <h2
@@ -58,7 +60,7 @@ export function CalendarHeader({
         aria-label={isPersian ? "ماه بعد" : "Next month"}
         onClick={onNextMonth}
         className='datepicker-nav-button'>
-        <span aria-hidden='true'>›</span>
+        <span aria-hidden='true'>{direction === "rtl" ? "‹" : "›"}</span>
       </button>
     </div>
   );

@@ -5,6 +5,45 @@ import { getCalendarAdapter, type CalendarAdapter } from "../adapters";
 import type { DatePickerProps } from "../../types";
 import { getSystemLocale } from "../locale";
 
+type ResolvedDirection = "ltr" | "rtl";
+
+const RTL_LANGUAGES = new Set([
+  "ar",
+  "arc",
+  "ckb",
+  "dv",
+  "fa",
+  "he",
+  "ps",
+  "sd",
+  "ug",
+  "ur",
+  "yi",
+]);
+
+const RTL_SCRIPTS = new Set(["adlm", "arab", "hebr", "nkoo", "syrc", "thaa"]);
+
+function resolveDirection(
+  direction: DatePickerProps["direction"],
+  locale: string,
+): ResolvedDirection {
+  // Explicit direction always takes priority.
+  if (direction === "ltr" || direction === "rtl") {
+    return direction;
+  }
+
+  // "auto" or an omitted value: infer from locale.
+  const parts = locale.toLowerCase().split("-");
+  const language = parts[0];
+  const script = parts.find((part) => /^[a-z]{4}$/.test(part));
+
+  if (script) {
+    return RTL_SCRIPTS.has(script) ? "rtl" : "ltr";
+  }
+
+  return RTL_LANGUAGES.has(language) ? "rtl" : "ltr";
+}
+
 export interface DatePickerContext {
   adapter: CalendarAdapter;
   locale: string;
@@ -12,6 +51,7 @@ export interface DatePickerContext {
   today: CalendarDate;
   constraints: DateConstraints;
   closeOnSelect: boolean;
+  direction: ResolvedDirection;
 }
 
 export function createInitialDatePickerContext(
@@ -45,5 +85,6 @@ export function createInitialDatePickerContext(
     today,
     constraints,
     closeOnSelect: props.closeOnSelect ?? true,
+    direction: resolveDirection(props.direction, locale),
   };
 }
