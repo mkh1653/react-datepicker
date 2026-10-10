@@ -35,13 +35,7 @@ export function createCalendarGrid(
 
   const gridStart = adapter.getStartOfWeek(monthStart, locale, firstDayOfWeek);
 
-  const weeksInMonth = adapter.getWeeksInMonth(
-    monthStart,
-    locale,
-    firstDayOfWeek,
-  );
-
-  const totalDays = weeksInMonth * 7;
+  const totalDays = 6 * 7;
 
   const days: CalendarDay[] = [];
 

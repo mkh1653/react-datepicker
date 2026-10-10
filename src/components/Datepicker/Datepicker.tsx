@@ -1,5 +1,6 @@
 import { cloneElement, isValidElement, useId } from "react";
 import type { MouseEventHandler, ReactElement } from "react";
+import type { CalendarDate } from "@internationalized/date";
 
 import {
   autoUpdate,
@@ -16,6 +17,8 @@ import type { DatePickerProps } from "../../types";
 import {
   useDatePickerState,
   type DatePickerStateAction,
+  type DatePickerContext,
+  type DatePickerState,
 } from "../../core/state";
 import { Calendar } from "../Calendar";
 
@@ -25,6 +28,56 @@ interface TriggerProps {
   "aria-haspopup"?: "dialog";
   "aria-expanded"?: boolean;
   "aria-controls"?: string;
+  type?: string;
+  value?: string;
+  defaultValue?: string;
+}
+
+function formatCalendarDate(
+  date: CalendarDate,
+  context: DatePickerContext,
+): string {
+  return context.adapter.format(date, context.locale, {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+}
+
+function formatSelectionValue(
+  state: DatePickerState,
+  context: DatePickerContext,
+): string {
+  const format = (date: CalendarDate) => formatCalendarDate(date, context);
+
+  const formatRange = (
+    start: CalendarDate | null,
+    end: CalendarDate | null,
+  ) => {
+    if (!start) return end ? format(end) : "";
+    if (!end) return format(start);
+
+    return `${format(start)} – ${format(end)}`;
+  };
+
+  switch (state.selection.mode) {
+    case "single":
+      return state.selection.value ? format(state.selection.value) : "";
+
+    case "multiple":
+      return state.selection.value.map(format).join(", ");
+
+    case "range":
+      return formatRange(
+        state.selection.value.start,
+        state.selection.value.end,
+      );
+
+    case "multiple-range":
+      return state.selection.value
+        .map((range) => formatRange(range.start, range.end))
+        .join(", ");
+  }
 }
 
 export function Datepicker(props: DatePickerProps) {
@@ -61,6 +114,15 @@ export function Datepicker(props: DatePickerProps) {
     ? (props.children as ReactElement<TriggerProps>)
     : null;
 
+  const formattedInputValue = formatSelectionValue(state, context);
+
+  const shouldFormatInput =
+    trigger !== null &&
+    trigger.type === "input" &&
+    (trigger.props.type === undefined || trigger.props.type === "text") &&
+    trigger.props.value === undefined &&
+    trigger.props.defaultValue === undefined;
+
   const handleTriggerClick: MouseEventHandler<HTMLElement> = (event) => {
     if (props.disabled || trigger?.props.disabled) {
       event.preventDefault();
@@ -79,16 +141,16 @@ export function Datepicker(props: DatePickerProps) {
   };
 
   const triggerNode = trigger
-    ? cloneElement(
-        trigger,
-        getReferenceProps({
+    ? cloneElement(trigger, {
+        ...getReferenceProps({
           onClick: handleTriggerClick,
           disabled: props.disabled || trigger.props.disabled,
           "aria-haspopup": "dialog",
           "aria-expanded": state.open,
           "aria-controls": calendarId,
         }),
-      )
+        ...(shouldFormatInput ? { value: formattedInputValue } : {}),
+      })
     : props.children;
 
   const handleCalendarAction = (action: DatePickerStateAction) => {
@@ -121,7 +183,7 @@ export function Datepicker(props: DatePickerProps) {
                   "aria-modal": true,
                 })}
                 ref={refs.setFloating}
-                className='relative max-h-[calc(100vh-2rem)] max-w-[calc(100vw-2rem)] overflow-auto rounded-md bg-white p-3 shadow-xl'>
+                className='datepicker-surface relative box-border w-96 max-w-[calc(100vw-2rem)] max-h-[calc(100vh-2rem)] overflow-auto rounded-md p-3 shadow-xl'>
                 <Calendar
                   state={state}
                   context={context}
@@ -138,7 +200,7 @@ export function Datepicker(props: DatePickerProps) {
               })}
               ref={refs.setFloating}
               style={floatingStyles}
-              className='z-[1000] max-h-[calc(100vh-1rem)] max-w-[calc(100vw-1rem)] overflow-auto rounded-md border border-slate-200 bg-white p-3 shadow-lg'>
+              className='datepicker-surface z-[1000] box-border w-96 max-w-[calc(100vw-2rem)] max-h-[calc(100vh-1rem)] overflow-auto rounded-md p-3 shadow-lg'>
               <Calendar
                 state={state}
                 context={context}

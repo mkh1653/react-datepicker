@@ -18,13 +18,13 @@ describe("createCalendarGrid", () => {
       today: new CalendarDate(2026, 9, 23),
     });
 
-    expect(grid.weeks.length).toBe(5);
+    expect(grid.weeks).toHaveLength(6);
 
     expect(grid.weeks.every((week) => week.days.length === 7)).toBe(true);
 
     expect(grid.weeks[0].days[0].date).toEqual(new CalendarDate(2026, 8, 30));
 
-    expect(grid.weeks[4].days[6].date).toEqual(new CalendarDate(2026, 10, 3));
+    expect(grid.weeks[5].days[6].date).toEqual(new CalendarDate(2026, 10, 10));
   });
 
   it("marks days outside the current month", () => {
@@ -44,15 +44,15 @@ describe("createCalendarGrid", () => {
     const outsideDays = allDays.filter((day) => !day.isCurrentMonth);
     const currentMonthDays = allDays.filter((day) => day.isCurrentMonth);
 
-    expect(outsideDays).toHaveLength(5);
+    expect(outsideDays).toHaveLength(12);
     expect(currentMonthDays).toHaveLength(30);
 
     expect(allDays.slice(0, 2).map((day) => day.date.day)).toEqual([30, 31]);
-    expect(allDays.slice(-3).map((day) => day.date.day)).toEqual([1, 2, 3]);
+    expect(allDays.slice(-3).map((day) => day.date.day)).toEqual([8, 9, 10]);
   });
 
   it("works with Persian calendar", () => {
-    const adapter = getCalendarAdapter("persian");
+    const adapter = getCalendarAdapter("islamic");
 
     const persianCalendar = createCalendar("persian");
 
@@ -65,7 +65,7 @@ describe("createCalendarGrid", () => {
       today: new CalendarDate(2026, 9, 23),
     });
 
-    expect(grid.weeks.length).toBeGreaterThanOrEqual(4);
+    expect(grid.weeks).toHaveLength(6);
 
     expect(grid.weeks.every((week) => week.days.length === 7)).toBe(true);
 
@@ -88,7 +88,7 @@ describe("createCalendarGrid", () => {
       today: new CalendarDate(2026, 9, 23),
     });
 
-    expect(grid.weeks.length).toBeGreaterThanOrEqual(4);
+    expect(grid.weeks).toHaveLength(6);
 
     expect(grid.weeks.every((week) => week.days.length === 7)).toBe(true);
   });

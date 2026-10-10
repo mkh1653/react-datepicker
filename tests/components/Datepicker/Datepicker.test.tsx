@@ -3,8 +3,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { CalendarDate } from "@internationalized/date";
-
+import { getCalendarAdapter } from "../../../src/core/adapters";
 import { Datepicker } from "../../../src/components/Datepicker";
+
 import "@testing-library/jest-dom/vitest";
 
 afterEach(() => {
@@ -245,5 +246,39 @@ describe("Datepicker", () => {
     expect(
       screen.getByRole("dialog", { name: "Choose date" }),
     ).not.toHaveAttribute("aria-modal", "true");
+  });
+
+  it("formats an input using the selected calendar and locale", () => {
+    const selectedDate = new Date("2026-09-10T12:00:00.000Z");
+    const adapter = getCalendarAdapter("gregorian");
+
+    const expectedValue = adapter.format(
+      new CalendarDate(2026, 9, 10),
+      "fa-IR",
+      {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      },
+    );
+
+    render(
+      <Datepicker
+        calendar='gregorian'
+        locale='fa-IR'
+        timeZone='UTC'
+        value={selectedDate}
+        onChange={vi.fn()}>
+        <input aria-label='Selected date' readOnly />
+      </Datepicker>,
+    );
+
+    expect(screen.getByRole("textbox", { name: "Selected date" })).toHaveValue(
+      expectedValue,
+    );
+
+    expect(expectedValue).toContain(
+      new Intl.NumberFormat("fa-IR", { useGrouping: false }).format(2026),
+    );
   });
 });

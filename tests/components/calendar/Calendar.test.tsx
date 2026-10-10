@@ -11,6 +11,7 @@ import {
   type DatePickerStateAction,
 } from "../../../src/core/state";
 import type { DatePickerProps } from "../../../src/types";
+import "@testing-library/jest-dom/vitest";
 
 afterEach(() => {
   cleanup();
@@ -154,7 +155,7 @@ describe("Calendar", () => {
 
     expect(context.adapter.identifier).toBe("persian");
 
-    expect(screen.getByText("15")).toBeInTheDocument();
+    expect(screen.getByText(new Intl.NumberFormat("fa-IR").format(15)),).toBeInTheDocument();
   });
 
   it("disables dates from disabledDates and prevents selection", async () => {
@@ -183,5 +184,72 @@ describe("Calendar", () => {
     await user.click(day);
 
     expect(dispatch).not.toHaveBeenCalled();
+  });
+
+  it("opens the month selection view when the month is clicked", async () => {
+    const user = userEvent.setup();
+    const { state, context } = createCalendarState();
+
+    render(<Calendar state={state} context={context} dispatch={vi.fn()} />);
+
+    await user.click(screen.getByRole("button", { name: "Select month" }));
+
+    expect(
+      screen.getByRole("group", { name: "Select month" }),
+    ).toBeInTheDocument();
+
+    expect(screen.getByRole("button", { name: "October" })).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole("grid", { name: "September 2026" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("changes the visible month when a month is selected", async () => {
+    const user = userEvent.setup();
+    const { state, context } = createCalendarState();
+    const dispatch = vi.fn<(action: DatePickerStateAction) => void>();
+
+    render(<Calendar state={state} context={context} dispatch={dispatch} />);
+
+    await user.click(screen.getByRole("button", { name: "Select month" }));
+
+    await user.click(screen.getByRole("button", { name: "October" }));
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "change-visible-date",
+      amount: 1,
+      unit: "month",
+    });
+
+    expect(
+      screen.queryByRole("group", { name: "Select month" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("opens the year selection view and changes the visible year", async () => {
+    const user = userEvent.setup();
+    const { state, context } = createCalendarState();
+    const dispatch = vi.fn<(action: DatePickerStateAction) => void>();
+
+    render(<Calendar state={state} context={context} dispatch={dispatch} />);
+
+    await user.click(screen.getByRole("button", { name: "Select year" }));
+
+    expect(
+      screen.getByRole("group", { name: "Select year" }),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "2028" }));
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "change-visible-date",
+      amount: 2,
+      unit: "year",
+    });
+
+    expect(
+      screen.queryByRole("group", { name: "Select year" }),
+    ).not.toBeInTheDocument();
   });
 });

@@ -9,51 +9,49 @@ describe("calendar adapter", () => {
       const gregorianAdapter = getCalendarAdapter("gregorian");
 
       // en-US → Sunday is the first day of the week
-      expect(gregorianAdapter.getWeekdayName(0, "en-US")).toBe("Sunday");
-      expect(gregorianAdapter.getWeekdayName(1, "en-US")).toBe("Monday");
-      expect(gregorianAdapter.getWeekdayName(2, "en-US")).toBe("Tuesday");
+      expect(gregorianAdapter.getWeekdayName(0, "en-US")).toBe("Sun");
+      expect(gregorianAdapter.getWeekdayName(1, "en-US")).toBe("Mon");
+      expect(gregorianAdapter.getWeekdayName(2, "en-US")).toBe("Tue");
 
       // fr-FR → Monday is the first day of the week
-      expect(gregorianAdapter.getWeekdayName(0, "fr-FR")).toBe("lundi");
-      expect(gregorianAdapter.getWeekdayName(1, "fr-FR")).toBe("mardi");
-      expect(gregorianAdapter.getWeekdayName(2, "fr-FR")).toBe("mercredi");
+      expect(gregorianAdapter.getWeekdayName(0, "fr-FR")).toBe("lun.");
+      expect(gregorianAdapter.getWeekdayName(1, "fr-FR")).toBe("mar.");
+      expect(gregorianAdapter.getWeekdayName(2, "fr-FR")).toBe("mer.");
 
       const persianAdapter = getCalendarAdapter("jalali");
 
       // fa-IR → Saturday is the first day of the week
-      expect(persianAdapter.getWeekdayName(0, "fa-IR")).toBe("شنبه");
-      expect(persianAdapter.getWeekdayName(1, "fa-IR")).toBe("یکشنبه");
-      expect(persianAdapter.getWeekdayName(2, "fa-IR")).toBe("دوشنبه");
+      expect(persianAdapter.getWeekdayName(0, "fa-IR")).toBe("شنب");
+      expect(persianAdapter.getWeekdayName(1, "fa-IR")).toBe("یک");
+      expect(persianAdapter.getWeekdayName(2, "fa-IR")).toBe("دو");
     });
 
     it("uses an explicit first day of week when provided", () => {
       const gregorianAdapter = getCalendarAdapter("gregorian");
 
       // Sunday-first
-      expect(gregorianAdapter.getWeekdayName(0, "en-US", "sun")).toBe("Sunday");
-      expect(gregorianAdapter.getWeekdayName(1, "en-US", "sun")).toBe("Monday");
+      expect(gregorianAdapter.getWeekdayName(0, "en-US", "sun")).toBe("Sun");
+      expect(gregorianAdapter.getWeekdayName(1, "en-US", "sun")).toBe("Mon");
 
       // Monday-first
-      expect(gregorianAdapter.getWeekdayName(0, "en-US", "mon")).toBe("Monday");
-      expect(gregorianAdapter.getWeekdayName(1, "en-US", "mon")).toBe(
-        "Tuesday",
-      );
+      expect(gregorianAdapter.getWeekdayName(0, "en-US", "mon")).toBe("Mon");
+      expect(gregorianAdapter.getWeekdayName(1, "en-US", "mon")).toBe("Tue");
 
       // Saturday-first
       expect(gregorianAdapter.getWeekdayName(0, "en-US", "sat")).toBe(
-        "Saturday",
+        "Sat",
       );
-      expect(gregorianAdapter.getWeekdayName(1, "en-US", "sat")).toBe("Sunday");
+      expect(gregorianAdapter.getWeekdayName(1, "en-US", "sat")).toBe("Sun");
 
       const persianAdapter = getCalendarAdapter("jalali");
 
       // Explicit Sunday-first should override fa-IR default.
-      expect(persianAdapter.getWeekdayName(0, "fa-IR", "sun")).toBe("یکشنبه");
-      expect(persianAdapter.getWeekdayName(1, "fa-IR", "sun")).toBe("دوشنبه");
+      expect(persianAdapter.getWeekdayName(0, "fa-IR", "sun")).toBe("یک");
+      expect(persianAdapter.getWeekdayName(1, "fa-IR", "sun")).toBe("دو");
 
       // Explicit Saturday-first.
-      expect(persianAdapter.getWeekdayName(0, "fa-IR", "sat")).toBe("شنبه");
-      expect(persianAdapter.getWeekdayName(1, "fa-IR", "sat")).toBe("یکشنبه");
+      expect(persianAdapter.getWeekdayName(0, "fa-IR", "sat")).toBe("شنب");
+      expect(persianAdapter.getWeekdayName(1, "fa-IR", "sat")).toBe("یک");
     });
 
     it("uses compact weekday labels for Persian locale", () => {
@@ -63,7 +61,7 @@ describe("calendar adapter", () => {
         adapter.getWeekdayName(index, "fa-IR"),
       );
 
-      expect(labels).toEqual(["ش", "ی", "د", "س", "چ", "پ", "ج"]);
+      expect(labels).toEqual(["شنب", "یک", "دو", "سه", "چهار", "پنج", "جمع"]);
     });
   });
 
@@ -77,7 +75,7 @@ describe("calendar adapter", () => {
 
       expect(adapter.getMonthName(date, "en-US")).toBe("September");
 
-      expect(adapter.getWeekdayName(0, "en-US")).toBe("Sunday");
+      expect(adapter.getWeekdayName(0, "en-US")).toBe("Sun");
 
       expect(
         adapter.format(date, "en-US", {

@@ -78,15 +78,32 @@ export class InternationalizedDateAdapter implements CalendarAdapter {
       days: weekday,
     });
 
-    const weekdayStyle = /^fa(?:-|$)/i.test(locale) ? "narrow" : "short";
+    const isPersianLocale = /^fa(?:-|$)/i.test(locale);
 
     const formatter = new Intl.DateTimeFormat(locale, {
       calendar: this.identifier,
-      weekday: weekdayStyle,
+      weekday: isPersianLocale ? "long" : "short",
       timeZone: "UTC",
     });
+    const weekdayName = formatter.format(date.toDate("UTC"));
 
-    return formatter.format(date.toDate("UTC"));
+    if (!isPersianLocale) {
+      return weekdayName;
+    }
+
+    const normalizedName = weekdayName.replace(/[\u200c\u200f\s]/g, "");
+
+    const persianAbbreviations: Record<string, string> = {
+      شنبه: "شنب",
+      یکشنبه: "یک",
+      دوشنبه: "دو",
+      سهشنبه: "سه",
+      چهارشنبه: "چهار",
+      پنجشنبه: "پنج",
+      جمعه: "جمع",
+    };
+
+    return persianAbbreviations[normalizedName] ?? weekdayName;
   }
 
   getDayOfWeek(

@@ -1,16 +1,7 @@
 import { useState } from "react";
 import { Datepicker } from "./components/Datepicker";
+import { formatDate } from "./core/locale";
 import "./styles.css";
-
-function formatDate(date: Date | null): string {
-  if (!date) {
-    return "تاریخی انتخاب نشده";
-  }
-
-  return date.toLocaleDateString("fa-IR", {
-    timeZone: "UTC",
-  });
-}
 
 const inputStyle = {
   width: "260px",
@@ -51,10 +42,13 @@ function App() {
             readOnly
             placeholder='Open popup'
             style={inputStyle}
+            value={formatDate(popupDate, {
+              calendar: "jalali",
+              locale: "fa-IR",
+            })}
           />
         </Datepicker>
 
-        <p>{formatDate(popupDate)}</p>
       </section>
 
       <section>
@@ -68,11 +62,10 @@ function App() {
             type='text'
             readOnly
             placeholder='Open dropdown'
+            value={formatDate(dropdownDate)}
             style={inputStyle}
           />
         </Datepicker>
-
-        <p>{formatDate(dropdownDate)}</p>
       </section>
 
       <div style={{ height: "70vh" }} />
@@ -91,10 +84,9 @@ function App() {
             readOnly
             placeholder='Test automatic positioning'
             style={inputStyle}
+            value={formatDate(dropdownDate)}
           />
         </Datepicker>
-
-        <p>{formatDate(bottomDate)}</p>
       </section>
     </main>
   );

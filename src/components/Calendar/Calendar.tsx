@@ -1,11 +1,14 @@
-import type { CalendarDate } from "@internationalized/date";
-import { createCalendarGrid, type CalendarDay } from "../../core/calendar";
-import { isDateDisabled } from "../../core/constraints";
+import { useState } from "react";
+
+import { createCalendarGrid } from "../../core/calendar";
 import type {
   DatePickerContext,
   DatePickerState,
   DatePickerStateAction,
 } from "../../core/state";
+
+import { CalendarGrid as CalendarGridView } from "./CalendarGrid";
+import { CalendarHeader } from "./CalendarHeader";
 
 interface CalendarProps {
   state: DatePickerState;
@@ -13,163 +16,236 @@ interface CalendarProps {
   dispatch: (action: DatePickerStateAction) => void;
 }
 
-function isSelectedDay(
-  day: CalendarDay,
-  state: DatePickerState,
-  context: DatePickerContext,
-): boolean {
-  const { selection } = state;
-
-  switch (selection.mode) {
-    case "single":
-      return (
-        selection.value !== null &&
-        context.adapter.isSameDay(day.date, selection.value)
-      );
-
-    case "multiple":
-      return selection.value.some((date) =>
-        context.adapter.isSameDay(day.date, date),
-      );
-
-    case "range": {
-      const { start, end } = selection.value;
-
-      if (!start) {
-        return false;
-      }
-
-      if (!end) {
-        return context.adapter.isSameDay(day.date, start);
-      }
-
-      return (
-        context.adapter.compare(day.date, start) >= 0 &&
-        context.adapter.compare(day.date, end) <= 0
-      );
-    }
-
-    case "multiple-range":
-      return selection.value.some(
-        (range) =>
-          context.adapter.compare(day.date, range.start) >= 0 &&
-          context.adapter.compare(day.date, range.end) <= 0,
-      );
-  }
-}
-
-function getDayLabel(date: CalendarDate, context: DatePickerContext): string {
-  return context.adapter.format(date, context.locale, {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
+type CalendarView = "days" | "months" | "years";
 
 export function Calendar({ state, context, dispatch }: CalendarProps) {
-  const grid = createCalendarGrid(context.adapter, {
-    date: state.visibleDate,
-    locale: context.locale,
+  const [view, setView] = useState<CalendarView>("days");
+  const [yearRangeOffset, setYearRangeOffset] = useState(0);
+
+  const { adapter, locale } = context;
+  const visibleDate = state.visibleDate;
+
+  const monthLabel = adapter.format(visibleDate, locale, {
+    month: "long",
+  });
+
+  const yearLabel = adapter.format(visibleDate, locale, {
+    year: "numeric",
+  });
+
+  const fullMonthLabel = adapter.format(visibleDate, locale, {
+    year: "numeric",
+    month: "long",
+  });
+
+  const grid = createCalendarGrid(adapter, {
+    date: visibleDate,
+    locale,
     today: context.today,
   });
 
-  const monthLabel = context.adapter.format(state.visibleDate, context.locale, {
-    year: "numeric",
-    month: "long",
+  const isPersian = /^fa(?:-|$)/i.test(locale);
+
+  const labels = {
+    selectMonth: isPersian ? "انتخاب ماه" : "Select month",
+    selectYear: isPersian ? "انتخاب سال" : "Select year",
+    back: isPersian ? "بازگشت به تقویم" : "Back to calendar",
+    previousYears: isPersian ? "۱۲ سال قبل" : "Previous years",
+    nextYears: isPersian ? "۱۲ سال بعد" : "Next years",
+  };
+
+  const firstMonthOfYear = adapter.addMonths(
+    visibleDate,
+    1 - visibleDate.month,
+  );
+
+  const months = Array.from({ length: 12 }, (_, index) =>
+    adapter.addMonths(firstMonthOfYear, index),
+  );
+
+  const firstYear = visibleDate.year - 5 + yearRangeOffset * 12;
+
+  const years = Array.from({ length: 12 }, (_, index) => {
+    const year = firstYear + index;
+
+    return {
+      year,
+      date: adapter.addYears(visibleDate, year - visibleDate.year),
+    };
   });
 
-  const weekdays = grid.weeks[0]?.days ?? [];
+  const formatYear = (date: typeof visibleDate) =>
+    adapter.format(date, locale, {
+      year: "numeric",
+    });
+
+  const handleMonthSelect = (month: number) => {
+    dispatch({
+      type: "change-visible-date",
+      amount: month - visibleDate.month,
+      unit: "month",
+    });
+
+    setView("days");
+  };
+
+  const handleYearSelect = (year: number) => {
+    dispatch({
+      type: "change-visible-date",
+      amount: year - visibleDate.year,
+      unit: "year",
+    });
+
+    setYearRangeOffset(0);
+    setView("days");
+  };
 
   return (
-    <div data-testid='calendar' className='w-full max-w-md'>
-      <div className='mb-4 flex items-center justify-between'>
-        <button
-          type='button'
-          aria-label='Previous month'
-          onClick={() =>
-            dispatch({
-              type: "change-visible-date",
-              amount: -1,
-              unit: "month",
-            })
-          }>
-          Previous
-        </button>
+    <div
+      data-testid='calendar'
+      className='flex h-[23rem] w-full min-w-0 flex-col'>
+      {view === "days" && (
+        <>
+          <CalendarHeader
+            monthLabel={monthLabel}
+            yearLabel={yearLabel}
+            fullMonthLabel={fullMonthLabel}
+            locale={locale}
+            onPreviousMonth={() =>
+              dispatch({
+                type: "change-visible-date",
+                amount: -1,
+                unit: "month",
+              })
+            }
+            onNextMonth={() =>
+              dispatch({
+                type: "change-visible-date",
+                amount: 1,
+                unit: "month",
+              })
+            }
+            onSelectMonth={() => setView("months")}
+            onSelectYear={() => {
+              setYearRangeOffset(0);
+              setView("years");
+            }}
+          />
 
-        <h2>{monthLabel}</h2>
-
-        <button
-          type='button'
-          aria-label='Next month'
-          onClick={() =>
-            dispatch({
-              type: "change-visible-date",
-              amount: 1,
-              unit: "month",
-            })
-          }>
-          Next
-        </button>
-      </div>
-
-      <div
-        role='grid'
-        aria-label={monthLabel}
-        className='grid grid-cols-7 gap-1'>
-        {weekdays.map((day) => (
-          <div key={day.dayOfWeek} role='columnheader' className='text-center'>
-            {context.adapter.getWeekdayName(day.dayOfWeek, context.locale)}
+          <div className='min-h-0 flex-1'>
+            <CalendarGridView
+              grid={grid}
+              monthLabel={fullMonthLabel}
+              state={state}
+              context={context}
+              dispatch={dispatch}
+            />
           </div>
-        ))}
+        </>
+      )}
 
-        {grid.weeks.map((week) => (
+      {view === "months" && (
+        <>
+          <div className='mb-4 flex h-10 items-center justify-between gap-2'>
+            <button
+              type='button'
+              aria-label={labels.back}
+              onClick={() => setView("days")}
+              className='datepicker-nav-button'>
+              ‹
+            </button>
+
+            <button
+              type='button'
+              aria-label={labels.selectYear}
+              onClick={() => {
+                setYearRangeOffset(0);
+                setView("years");
+              }}
+              className='rounded-md px-2 py-1 font-semibold'>
+              {yearLabel}
+            </button>
+
+            <span className='text-sm'>{labels.selectMonth}</span>
+          </div>
+
           <div
-            key={week.days[0].date.toString()}
-            role='row'
-            className='contents'>
-            {week.days.map((day) => {
-              const selected = isSelectedDay(day, state, context);
-              const disabled = isDateDisabled(
-                day.date,
-                context.constraints,
-                context.adapter,
-              );
+            role='group'
+            aria-label={labels.selectMonth}
+            className='grid min-h-0 flex-1 grid-cols-3 grid-rows-4 gap-2'>
+            {months.map((monthDate) => {
+              const label = adapter.format(monthDate, locale, {
+                month: "long",
+              });
+
+              const selected = monthDate.month === visibleDate.month;
 
               return (
-                <div
-                  key={day.date.toString()}
-                  role='gridcell'
-                  aria-selected={selected}>
-                  <button
-                    type='button'
-                    aria-label={getDayLabel(day.date, context)}
-                    disabled={disabled}
-                    onClick={() => {
-                      if (disabled) {
-                        return;
-                      }
-                      dispatch({
-                        type: "select-calendar-date",
-                        date: day.date,
-                      });
-                    }}
-                    className={[
-                      "flex h-10 w-full items-center justify-center rounded",
-                      !day.isCurrentMonth && "opacity-40",
-                      day.isToday && "font-bold",
-                      selected && "font-semibold underline",
-                      disabled && "cursor-not-allowed opacity-40",
-                    ]
-                      .filter(Boolean)
-                      .join(" ")}>
-                    {day.date.day}
-                  </button>
-                </div>
+                <button
+                  key={monthDate.toString()}
+                  type='button'
+                  aria-label={label}
+                  data-selected={selected ? "true" : undefined}
+                  onClick={() => handleMonthSelect(monthDate.month)}
+                  className='datepicker-option'>
+                  {label}
+                </button>
               );
             })}
           </div>
-        ))}
-      </div>
+        </>
+      )}
+
+      {view === "years" && (
+        <>
+          <div className='mb-4 flex h-10 items-center justify-between gap-2'>
+            <button
+              type='button'
+              aria-label={labels.previousYears}
+              onClick={() => setYearRangeOffset((offset) => offset - 1)}
+              className='datepicker-nav-button'>
+              ‹
+            </button>
+
+            <h2 className='text-sm font-semibold'>
+              {formatYear(years[0].date)} –{" "}
+              {formatYear(years[years.length - 1].date)}
+            </h2>
+
+            <button
+              type='button'
+              aria-label={labels.nextYears}
+              onClick={() => setYearRangeOffset((offset) => offset + 1)}
+              className='datepicker-nav-button'>
+              ›
+            </button>
+          </div>
+
+          <div
+            role='group'
+            aria-label={labels.selectYear}
+            className='grid min-h-0 flex-1 grid-cols-3 grid-rows-4 gap-2'>
+            {years.map(({ year, date }) => (
+              <button
+                key={year}
+                type='button'
+                aria-label={formatYear(date)}
+                data-selected={year === visibleDate.year ? "true" : undefined}
+                onClick={() => handleYearSelect(year)}
+                className='datepicker-option'>
+                {formatYear(date)}
+              </button>
+            ))}
+          </div>
+          <button
+            type='button'
+            aria-label={labels.back}
+            onClick={() => setView("days")}
+            className='datepicker-back-button'>
+            {labels.back}
+          </button>
+        </>
+      )}
     </div>
   );
 }
